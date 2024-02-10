@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "339012363985",
+    "project_id": "eco-poly",
+    "storage_bucket": "eco-poly.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339012363985:android:c1e35bebbaf85915c7c7f0",
+        "android_client_info": {
+          "package_name": "com.example.ecopoly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCDuORzLn99q839H1KVQFaWONZ3VDVrag"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
