@@ -9,17 +9,17 @@ class GameManager {
   factory GameManager() => _instance;
 
   List<Player> players = const [];
-  Player currentPlayer = Player(name: '', money: 0);
+  Player currentPlayer = Player(name: '', money: 0, index: 0);
 
   GameManager._init() {
     players = [];
-    currentPlayer = Player(name: '', money: 0);
+    currentPlayer = Player(name: '', money: 0, index: 0);
   }
 
   void setPlayers(int numberOfPlayers) {
     players = List.generate(
       numberOfPlayers,
-      (index) => Player(name: 'Player ${index + 1}', money: 1500),
+      (index) => Player(name: 'Player ${index + 1}', money: 1500, index: index),
     );
   }
 
@@ -35,12 +35,12 @@ class GameManager {
     print(
         "player ${currentPlayer.name} rolled a $firstDie and $secondDie, now at position ${currentPlayer.position}");
 
-    currentPlayer = nextPlayer();
+    currentPlayer = _nextPlayer();
 
     return (firstDie, secondDie);
   }
 
-  Player nextPlayer() {
+  Player _nextPlayer() {
     return players[(players.indexOf(currentPlayer) + 1) % players.length];
   }
 
