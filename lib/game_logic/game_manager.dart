@@ -3,23 +3,29 @@
 import 'dart:math';
 
 import 'package:ecopoly/models/player.dart';
+import 'package:flutter/material.dart';
 
 class GameManager {
   static final _instance = GameManager._init();
   factory GameManager() => _instance;
 
   List<Player> players = const [];
-  Player currentPlayer = Player(name: '', money: 0, index: 0);
+  Player currentPlayer =
+      Player(name: '', money: 0, index: 0, color: Colors.blue);
 
   GameManager._init() {
     players = [];
-    currentPlayer = Player(name: '', money: 0, index: 0);
+    currentPlayer = Player(name: '', money: 0, index: 0, color: Colors.blue);
   }
 
   void setPlayers(int numberOfPlayers) {
     players = List.generate(
       numberOfPlayers,
-      (index) => Player(name: 'Player ${index + 1}', money: 1500, index: index),
+      (index) => Player(
+          name: 'Player ${index + 1}',
+          money: 1500,
+          index: index,
+          color: Colors.primaries[index]),
     );
   }
 
@@ -30,6 +36,7 @@ class GameManager {
   (int, int) rollDice() {
     var firstDie = Random().nextInt(6) + 1;
     var secondDie = Random().nextInt(6) + 1;
+
     currentPlayer.position =
         (currentPlayer.position + (firstDie + secondDie)) % 40;
     print(
