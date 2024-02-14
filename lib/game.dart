@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors
+// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, unused_local_variable, avoid_print
 
 import 'dart:ui';
 
@@ -11,6 +11,7 @@ import "dart:math";
 const double width = 40;
 const double height = 40;
 const playerSize = 18.0;
+const gridWidth = 11;
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -21,18 +22,17 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   GameManager gameManager = GameManager();
-
+  int xPosition = 0;
+  int yPosition = 0;
   @override
   void initState() {
     super.initState();
-    gameManager.setPlayers(4);
+    gameManager.setPlayers(1);
     gameManager.startGame();
   }
 
   @override
   Widget build(BuildContext context) {
-    int yPosition = 9;
-    int xPosition = 10;
     return Scaffold(
       body: Container(
         color: Colors.blueGrey,
@@ -44,94 +44,95 @@ class _GameScreenState extends State<GameScreen> {
                 child: Transform.translate(
                   offset: Offset(100, 0),
                   child: FittedBox(
-                    child: GestureDetector(
-                      onTapDown: (TapDownDetails details) {
-                        // Get the position of the tap relative to the container
-                        Offset tapPosition = details.localPosition;
+                    child: Stack(alignment: Alignment.center, children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black, width: 1),
+                          color:
+                              ColorScheme.fromSeed(seedColor: Colors.deepPurple)
+                                  .primaryContainer,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset: const Offset(
+                                  0, 3), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                        child: LayoutGrid(
+                          areas: '''
+                                    go       city1     jail
+                                    city2    content   city3
+                                    gotojail city4     parking
+                                  ''',
+                          columnSizes: const [auto, auto, auto],
+                          rowSizes: const [auto, auto, auto],
+                          columnGap: 0,
+                          rowGap: 0,
+                          children: [
+                            jail(gameManager: gameManager).inGridArea('go'),
+                            cityRow(gameManager.players,
+                                    playerPosition:
+                                        gameManager.currentPlayer.index,
+                                    index: 0)
+                                .inGridArea('city1'),
+                            cityColumn(gameManager.players,
+                                    playerPosition:
+                                        gameManager.currentPlayer.index,
+                                    index: 3)
+                                .inGridArea('city2'),
+                            cityColumn(gameManager.players,
+                                    playerPosition:
+                                        gameManager.currentPlayer.index,
+                                    index: 1)
+                                .inGridArea('city3'),
+                            cityRow(gameManager.players,
+                                    playerPosition:
+                                        gameManager.currentPlayer.index,
+                                    index: 2)
+                                .inGridArea('city4'),
+                            Container(
+                              color: Colors.blueGrey.shade200,
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    gameManager.rollDice();
+                                    (int, int) pos = updatePosition(
+                                        xPosition,
+                                        yPosition,
+                                        gameManager.currentPlayer.position);
 
-                        // Log the position
-                        print('Tap Position: $tapPosition');
-                      },
-                      child: Stack(alignment: Alignment.center, children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 1),
-                            color: ColorScheme.fromSeed(
-                                    seedColor: Colors.deepPurple)
-                                .primaryContainer,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(
-                                    0, 3), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: LayoutGrid(
-                            areas: '''
-                                      go       city1     jail
-                                      city2    content   city3
-                                      gotojail city4     parking
-                                    ''',
-                            columnSizes: const [auto, auto, auto],
-                            rowSizes: const [auto, auto, auto],
-                            columnGap: 0,
-                            rowGap: 0,
-                            children: [
-                              jail(gameManager: gameManager).inGridArea('go'),
-                              cityRow(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 0)
-                                  .inGridArea('city1'),
-                              cityColumn(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 3)
-                                  .inGridArea('city2'),
-                              cityColumn(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 1)
-                                  .inGridArea('city3'),
-                              cityRow(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 2)
-                                  .inGridArea('city4'),
-                              Container(
-                                color: Colors.blueGrey.shade200,
-                                child: Center(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      gameManager.rollDice();
-                                      setState(() {});
-                                    },
-                                    child: Text("Roll dice"),
-                                  ),
+                                    setState(() {
+                                      print("$xPosition");
+                                      xPosition = pos.$1;
+                                      print("$xPosition");
+                                      yPosition = pos.$2;
+                                    });
+                                  },
+                                  child: Text("Roll dice"),
                                 ),
-                              ).inGridArea("content"),
-                              jail().inGridArea('jail'),
-                              jail().inGridArea('gotojail'),
-                              jail().inGridArea('parking')
-                            ],
-                          ),
+                              ),
+                            ).inGridArea("content"),
+                            jail().inGridArea('jail'),
+                            jail().inGridArea('gotojail'),
+                            jail().inGridArea('parking')
+                          ],
                         ),
-                        Positioned(
-                          // top: 10,
-                          // right: 10,
-                          top: ((width - playerSize) / 2) +
-                              width * yPosition +
-                              yPosition,
-                          left: (width - playerSize) / 2 +
-                              width * xPosition +
-                              xPosition,
-                          child: playerModel(Colors.black),
-                        ),
-                      ]),
-                    ),
+                      ),
+                      AnimatedPositioned(
+                        duration: Duration(milliseconds: 400),
+                        curve: Curves.easeInOut,
+                        top: ((width - playerSize) / 2) +
+                            width * yPosition +
+                            yPosition,
+                        left: (width - playerSize) / 2 +
+                            width * xPosition +
+                            xPosition,
+                        child: playerModel(Colors.black),
+                      ),
+                    ]),
                   ),
                 ),
               ),
@@ -141,6 +142,38 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
+}
+
+(int, int) updatePosition(int x, int y, int targetCell) {
+  int distanceToTraverse = targetCell - getIndex(x, y);
+  int xPosition = x;
+  int yPosition = y;
+
+  while (distanceToTraverse != 0) {
+    if (xPosition == 0 && yPosition < gridWidth - 1) {
+      yPosition++;
+    } else if (yPosition == gridWidth - 1 && xPosition < gridWidth - 1) {
+      xPosition++;
+    } else if (xPosition == gridWidth - 1 && yPosition > 0) {
+      yPosition--;
+    } else if (yPosition == 0 && xPosition > 0) {
+      xPosition--;
+    }
+
+    distanceToTraverse = targetCell - getIndex(xPosition, yPosition);
+  }
+  return (xPosition, yPosition);
+}
+
+int getIndex(int x, int y) {
+  if (y <= x) {
+    return x + y;
+  } else if (y > x && x != 0) {
+    return gridWidth + y + (gridWidth - x - 1) - 1;
+  } else if (y > x && x == 0) {
+    return (3 * gridWidth - 3) + (gridWidth - y) - 1;
+  }
+  return 0;
 }
 
 class BlurryContainer extends StatelessWidget {
@@ -238,8 +271,8 @@ Widget cityRow(List<Player> players, {int playerPosition = -1, int index = 0}) {
           //       ))
           // else
           _buildSquare(0, width: width, height: height),
-          // TODO: pass current player to the playerbox to be drawn differently
-          playerBox(players, curentPlayer, cellIndex, index),
+          // playerBox(players, curentPlayer, cellIndex, index),
+          Text("${children.indexOf(child) + (index * 10) + 1}")
         ],
       );
     }).toList(),
@@ -400,7 +433,7 @@ Widget playerEye() {
             color: Colors.black,
           ),
         ),
-      )
+      ),
     ],
   );
 }
@@ -446,7 +479,8 @@ Widget cityColumn(
                 child: _buildSquare(0, width: width, height: height),
               ),
             ),
-          playerBox(players, curentPlayer, cellIndex, index)
+          // playerBox(players, curentPlayer, cellIndex, index),
+          Text("${children.indexOf(child) + (index * 10) + 1}")
         ],
       );
     }).toList(),
