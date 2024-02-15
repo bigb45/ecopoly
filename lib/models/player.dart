@@ -7,6 +7,8 @@ class Player {
   int money;
   List<Property> properties = const [];
   int position = 0;
+  int xPosition = 0;
+  int yPosition = 0;
   int index;
   Color color;
   Player({

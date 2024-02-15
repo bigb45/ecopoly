@@ -5,6 +5,8 @@ import 'dart:math';
 import 'package:ecopoly/models/player.dart';
 import 'package:flutter/material.dart';
 
+const gridWidth = 11;
+
 class GameManager {
   static final _instance = GameManager._init();
   factory GameManager() => _instance;
@@ -41,10 +43,14 @@ class GameManager {
         (currentPlayer.position + (firstDie + secondDie)) % 40;
     print(
         "player ${currentPlayer.name} rolled a $firstDie and $secondDie, now at position ${currentPlayer.position}");
-
-    currentPlayer = _nextPlayer();
+    updatePosition(currentPlayer.xPosition, currentPlayer.yPosition,
+        currentPlayer.position);
 
     return (firstDie, secondDie);
+  }
+
+  void endTurn() {
+    currentPlayer = _nextPlayer();
   }
 
   Player _nextPlayer() {
@@ -53,5 +59,39 @@ class GameManager {
 
   void endGame() {
     print("Game ended");
+  }
+
+  (int, int) updatePosition(int x, int y, int targetCell) {
+    int distanceToTraverse = targetCell - getIndex(x, y);
+    int xPosition = x;
+    int yPosition = y;
+
+    while (distanceToTraverse != 0) {
+      if (xPosition == 0 && yPosition < gridWidth - 1) {
+        yPosition++;
+      } else if (yPosition == gridWidth - 1 && xPosition < gridWidth - 1) {
+        xPosition++;
+      } else if (xPosition == gridWidth - 1 && yPosition > 0) {
+        yPosition--;
+      } else if (yPosition == 0 && xPosition > 0) {
+        xPosition--;
+      }
+
+      distanceToTraverse = targetCell - getIndex(xPosition, yPosition);
+    }
+    currentPlayer.xPosition = xPosition;
+    currentPlayer.yPosition = yPosition;
+    return (xPosition, yPosition);
+  }
+
+  int getIndex(int x, int y) {
+    if (y <= x) {
+      return x + y;
+    } else if (y > x && x != 0) {
+      return gridWidth + y + (gridWidth - x - 1) - 1;
+    } else if (y > x && x == 0) {
+      return (3 * gridWidth - 3) + (gridWidth - y) - 1;
+    }
+    return 0;
   }
 }

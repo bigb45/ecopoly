@@ -22,12 +22,11 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   GameManager gameManager = GameManager();
-  int xPosition = 0;
-  int yPosition = 0;
+
   @override
   void initState() {
     super.initState();
-    gameManager.setPlayers(1);
+    gameManager.setPlayers(4);
     gameManager.startGame();
   }
 
@@ -44,95 +43,135 @@ class _GameScreenState extends State<GameScreen> {
                 child: Transform.translate(
                   offset: Offset(100, 0),
                   child: FittedBox(
-                    child: Stack(alignment: Alignment.center, children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 1),
-                          color:
-                              ColorScheme.fromSeed(seedColor: Colors.deepPurple)
-                                  .primaryContainer,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(
-                                  0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        child: LayoutGrid(
-                          areas: '''
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black, width: 1),
+                            color: ColorScheme.fromSeed(
+                                    seedColor: Colors.deepPurple)
+                                .primaryContainer,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: LayoutGrid(
+                            areas: '''
                                     go       city1     jail
                                     city2    content   city3
                                     gotojail city4     parking
                                   ''',
-                          columnSizes: const [auto, auto, auto],
-                          rowSizes: const [auto, auto, auto],
-                          columnGap: 0,
-                          rowGap: 0,
-                          children: [
-                            jail(gameManager: gameManager).inGridArea('go'),
-                            cityRow(gameManager.players,
-                                    playerPosition:
-                                        gameManager.currentPlayer.index,
-                                    index: 0)
-                                .inGridArea('city1'),
-                            cityColumn(gameManager.players,
-                                    playerPosition:
-                                        gameManager.currentPlayer.index,
-                                    index: 3)
-                                .inGridArea('city2'),
-                            cityColumn(gameManager.players,
-                                    playerPosition:
-                                        gameManager.currentPlayer.index,
-                                    index: 1)
-                                .inGridArea('city3'),
-                            cityRow(gameManager.players,
-                                    playerPosition:
-                                        gameManager.currentPlayer.index,
-                                    index: 2)
-                                .inGridArea('city4'),
-                            Container(
-                              color: Colors.blueGrey.shade200,
-                              child: Center(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    gameManager.rollDice();
-                                    (int, int) pos = updatePosition(
-                                        xPosition,
-                                        yPosition,
-                                        gameManager.currentPlayer.position);
-
-                                    setState(() {
-                                      print("$xPosition");
-                                      xPosition = pos.$1;
-                                      print("$xPosition");
-                                      yPosition = pos.$2;
-                                    });
-                                  },
-                                  child: Text("Roll dice"),
+                            columnSizes: const [auto, auto, auto],
+                            rowSizes: const [auto, auto, auto],
+                            columnGap: 0,
+                            rowGap: 0,
+                            children: [
+                              jail(gameManager: gameManager).inGridArea('go'),
+                              cityRow(gameManager.players,
+                                      playerPosition:
+                                          gameManager.currentPlayer.index,
+                                      index: 0)
+                                  .inGridArea('city1'),
+                              cityColumn(gameManager.players,
+                                      playerPosition:
+                                          gameManager.currentPlayer.index,
+                                      index: 3)
+                                  .inGridArea('city2'),
+                              cityColumn(gameManager.players,
+                                      playerPosition:
+                                          gameManager.currentPlayer.index,
+                                      index: 1)
+                                  .inGridArea('city3'),
+                              cityRow(gameManager.players,
+                                      playerPosition:
+                                          gameManager.currentPlayer.index,
+                                      index: 2)
+                                  .inGridArea('city4'),
+                              Container(
+                                color: Colors.blueGrey.shade200,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          gameManager.rollDice();
+                                          setState(() {});
+                                        },
+                                        child: Text("Roll dice"),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          gameManager.endTurn();
+                                          setState(() {});
+                                        },
+                                        child: Text("End turn"),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ).inGridArea("content"),
-                            jail().inGridArea('jail'),
-                            jail().inGridArea('gotojail'),
-                            jail().inGridArea('parking')
-                          ],
+                              ).inGridArea("content"),
+                              jail().inGridArea('jail'),
+                              jail().inGridArea('gotojail'),
+                              jail().inGridArea('parking')
+                            ],
+                          ),
                         ),
-                      ),
-                      AnimatedPositioned(
-                        duration: Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                        top: ((width - playerSize) / 2) +
-                            width * yPosition +
-                            yPosition,
-                        left: (width - playerSize) / 2 +
-                            width * xPosition +
-                            xPosition,
-                        child: playerModel(Colors.black),
-                      ),
-                    ]),
+                        ...gameManager.players.map(
+                          (player) {
+                            double playerDirection =
+                                getDirection(player.position);
+                            return Builder(
+                              builder: (context) {
+                                if (player.index !=
+                                    gameManager.currentPlayer.index) {
+                                  return AnimatedPositioned(
+                                    duration: Duration(milliseconds: 400),
+                                    curve: Curves.easeInOut,
+                                    top: ((width - playerSize) / 2) +
+                                        width * player.yPosition +
+                                        player.yPosition,
+                                    left: (width - playerSize) / 2 +
+                                        width * player.xPosition +
+                                        player.xPosition,
+                                    child: Transform.rotate(
+                                      angle: playerDirection,
+                                      child: playerModel(player.color),
+                                    ),
+                                  );
+                                } else {
+                                  return AnimatedPositioned(
+                                    duration: Duration(milliseconds: 400),
+                                    curve: Curves.easeInOut,
+                                    top: ((width - playerSize) / 2) +
+                                        width * player.yPosition +
+                                        player.yPosition,
+                                    left: (width - playerSize) / 2 +
+                                        width * player.xPosition +
+                                        player.xPosition,
+                                    child: AnimatedScale(
+                                      duration: Duration(milliseconds: 600),
+                                      curve: Curves.easeInOut,
+                                      scale: 1.4,
+                                      child: Transform.rotate(
+                                        angle: playerDirection,
+                                        child: playerModel(player.color),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        ).toList(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -144,36 +183,16 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-(int, int) updatePosition(int x, int y, int targetCell) {
-  int distanceToTraverse = targetCell - getIndex(x, y);
-  int xPosition = x;
-  int yPosition = y;
-
-  while (distanceToTraverse != 0) {
-    if (xPosition == 0 && yPosition < gridWidth - 1) {
-      yPosition++;
-    } else if (yPosition == gridWidth - 1 && xPosition < gridWidth - 1) {
-      xPosition++;
-    } else if (xPosition == gridWidth - 1 && yPosition > 0) {
-      yPosition--;
-    } else if (yPosition == 0 && xPosition > 0) {
-      xPosition--;
-    }
-
-    distanceToTraverse = targetCell - getIndex(xPosition, yPosition);
+double getDirection(int position) {
+  if (position < 10) {
+    return pi;
+  } else if (position < 20) {
+    return -pi / 2;
+  } else if (position < 30) {
+    return 2 * pi;
+  } else {
+    return pi / 2;
   }
-  return (xPosition, yPosition);
-}
-
-int getIndex(int x, int y) {
-  if (y <= x) {
-    return x + y;
-  } else if (y > x && x != 0) {
-    return gridWidth + y + (gridWidth - x - 1) - 1;
-  } else if (y > x && x == 0) {
-    return (3 * gridWidth - 3) + (gridWidth - y) - 1;
-  }
-  return 0;
 }
 
 class BlurryContainer extends StatelessWidget {
@@ -195,10 +214,11 @@ class BlurryContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(
-              color: Colors.black,
-              width: 1,
-              strokeAlign: BorderSide.strokeAlignCenter)),
+        border: Border.all(
+            color: Colors.black,
+            width: 1,
+            strokeAlign: BorderSide.strokeAlignCenter),
+      ),
       child: Stack(
         children: [
           ClipRRect(
@@ -223,11 +243,6 @@ class BlurryContainer extends StatelessWidget {
               ),
             ),
           ),
-          // Container(
-          //   color: Colors.red,
-          //   // height: context.of,
-          //   child: Text("test", style: TextStyle(color: Colors.white)),
-          // )
         ],
       ),
     );
@@ -263,13 +278,6 @@ Widget cityRow(List<Player> players, {int playerPosition = -1, int index = 0}) {
 
       return Stack(
         children: [
-          // if (curentPlayer.position == children.indexOf(child) + (index * 10))
-          //   Transform.scale(
-          //       scaleY: 1,
-          //       child: Container(
-          //         child: _buildSquare(0, width: width, height: height),
-          //       ))
-          // else
           _buildSquare(0, width: width, height: height),
           // playerBox(players, curentPlayer, cellIndex, index),
           Text("${children.indexOf(child) + (index * 10) + 1}")
@@ -333,7 +341,6 @@ class AnimatedScale extends StatefulWidget {
   final Duration duration;
   final Curve curve;
   final Widget child;
-
   const AnimatedScale(
       {super.key,
       required this.scale,
@@ -351,6 +358,8 @@ class _AnimatedScaleState extends State<AnimatedScale>
   late Animation<double> _scaleAnimation;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  late Animation<double> _rotationAnimation;
+  late AnimationController _rotationController;
 
   @override
   void initState() {
@@ -365,6 +374,11 @@ class _AnimatedScaleState extends State<AnimatedScale>
     _fadeAnimation =
         Tween<double>(begin: 1.0, end: 0.6).animate(_fadeController);
 
+    _rotationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 700));
+    _rotationAnimation =
+        Tween<double>(begin: 0, end: 1).animate(_rotationController);
+
     _fadeController.repeat(reverse: true);
     _scaleController.forward();
   }
@@ -373,6 +387,7 @@ class _AnimatedScaleState extends State<AnimatedScale>
   void dispose() {
     _scaleController.dispose();
     _fadeController.dispose();
+    _rotationController.dispose();
     super.dispose();
   }
 
@@ -382,7 +397,10 @@ class _AnimatedScaleState extends State<AnimatedScale>
       scale: _scaleAnimation,
       child: FadeTransition(
         opacity: _fadeAnimation,
-        child: widget.child,
+        child: RotationTransition(
+          turns: _rotationAnimation,
+          child: widget.child,
+        ),
       ),
     );
   }
@@ -402,7 +420,7 @@ Widget playerModel(Color playerColor) {
             color: Colors.black.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 3,
-          )
+          ),
         ],
       ),
     ),
@@ -492,6 +510,6 @@ Widget _buildSquare(int index, {double width = 80, double height = 50}) {
       width: width,
       height: height,
       blurStrength: 2,
-      image: 'assets/images/brazil.png',
+      image: 'assets/images/spain.png',
       child: SizedBox());
 }
