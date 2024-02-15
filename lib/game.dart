@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, unused_local_variable, avoid_print
-
 import 'dart:ui';
 
 import 'package:ecopoly/game_logic/game_manager.dart';
-import 'package:ecopoly/models/player.dart';
+import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import "dart:math";
@@ -73,26 +73,11 @@ class _GameScreenState extends State<GameScreen> {
                             rowGap: 0,
                             children: [
                               jail(gameManager: gameManager).inGridArea('go'),
-                              cityRow(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 0)
+                              cityRow(index: 0, cities: board.sublist(1, 11))
                                   .inGridArea('city1'),
-                              cityColumn(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 3)
-                                  .inGridArea('city2'),
-                              cityColumn(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 1)
-                                  .inGridArea('city3'),
-                              cityRow(gameManager.players,
-                                      playerPosition:
-                                          gameManager.currentPlayer.index,
-                                      index: 2)
-                                  .inGridArea('city4'),
+                              cityColumn(index: 3).inGridArea('city2'),
+                              cityColumn(index: 1).inGridArea('city3'),
+                              cityRow(index: 2, cities: []).inGridArea('city4'),
                               Container(
                                 color: Colors.blueGrey.shade200,
                                 child: Center(
@@ -136,10 +121,12 @@ class _GameScreenState extends State<GameScreen> {
                                     curve: Curves.easeInOut,
                                     top: ((width - playerSize) / 2) +
                                         width * player.yPosition +
-                                        player.yPosition,
+                                        player.yPosition +
+                                        10,
                                     left: (width - playerSize) / 2 +
                                         width * player.xPosition +
-                                        player.xPosition,
+                                        player.xPosition +
+                                        10,
                                     child: Transform.rotate(
                                       angle: playerDirection,
                                       child: playerModel(player.color),
@@ -262,146 +249,42 @@ Widget jail({GameManager? gameManager}) {
   );
 }
 
-Widget cityRow(List<Player> players, {int playerPosition = -1, int index = 0}) {
-  List<Widget> children = List.generate(
-    9,
-    (index) {
-      return _buildSquare(index, width: height, height: width);
-    },
-  );
-  final curentPlayer = players[playerPosition];
-  bool reverseOrder = index == 2;
-  return Row(
-    textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
-    children: children.map((child) {
-      int cellIndex = children.indexOf(child) + (index * 10);
+Widget cityRow({int index = 0, required List<Cell> cities}) {
+  if (cities.isEmpty) {
+    List<Widget> children = List.generate(
+      9,
+      (index) {
+        return _buildSquare(index, width: height, height: width);
+      },
+    );
+    bool reverseOrder = index == 2;
+    return Row(
+      textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
+      children: children.map((child) {
+        int cellIndex = children.indexOf(child) + (index * 10);
 
-      return Stack(
-        children: [
-          _buildSquare(0, width: width, height: height),
-          // playerBox(players, curentPlayer, cellIndex, index),
-          Text("${children.indexOf(child) + (index * 10) + 1}")
-        ],
-      );
-    }).toList(),
-  );
-}
+        return Stack(
+          children: [
+            _buildSquare(0, width: width, height: height),
+            Text("${children.indexOf(child) + (index * 10) + 1}")
+          ],
+        );
+      }).toList(),
+    );
+  } else {
+    bool reverseOrder = index == 2;
+    return Row(
+      textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
+      children: cities.map((city) {
+        int cellIndex = cities.indexOf(city) + (index * 10);
 
-Widget playerBox(
-    List<Player> players, Player currentPlayer, int cellIndex, int groupIndex) {
-  List<Player> playersInCell =
-      players.where((player) => player.position == cellIndex).toList();
-  int playersInCellCount = playersInCell.length;
-  return SizedBox(
-    width: width,
-    height: height,
-    child: Stack(
-      clipBehavior: Clip.hardEdge,
-      alignment: Alignment.center,
-      children: [
-        ...playersInCell.asMap().entries.map((entry) {
-          int index = entry.key;
-          Player player = entry.value;
-
-          double offset = height / 16;
-          if (playersInCellCount > 1) {
-            offset = (index) * (height / (playersInCellCount + 1));
-          }
-
-          if (playersInCellCount == 1) {
-            offset = height / 3;
-          }
-
-          if (player.index != currentPlayer.index) {
-            return Positioned(
-              top: offset,
-              child: Transform.rotate(
-                  angle: -(90 * groupIndex * (pi / 180)),
-                  child: playerModel(player.color)),
-            );
-          }
-          return SizedBox();
-        }),
-        if (currentPlayer.position == cellIndex)
-          Center(
-            child: AnimatedScale(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              scale: 1.4,
-              child: playerModel(currentPlayer.color),
-            ),
-          ),
-      ],
-    ),
-  );
-}
-
-class AnimatedScale extends StatefulWidget {
-  final double scale;
-  final Duration duration;
-  final Curve curve;
-  final Widget child;
-  const AnimatedScale(
-      {super.key,
-      required this.scale,
-      required this.duration,
-      required this.curve,
-      required this.child});
-
-  @override
-  State<AnimatedScale> createState() => _AnimatedScaleState();
-}
-
-class _AnimatedScaleState extends State<AnimatedScale>
-    with TickerProviderStateMixin {
-  late AnimationController _scaleController;
-  late Animation<double> _scaleAnimation;
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _rotationAnimation;
-  late AnimationController _rotationController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scaleController =
-        AnimationController(vsync: this, duration: widget.duration);
-    _scaleAnimation = Tween<double>(begin: 1, end: widget.scale).animate(
-        CurvedAnimation(parent: _scaleController, curve: widget.curve));
-
-    _fadeController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 700));
-    _fadeAnimation =
-        Tween<double>(begin: 1.0, end: 0.6).animate(_fadeController);
-
-    _rotationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 700));
-    _rotationAnimation =
-        Tween<double>(begin: 0, end: 1).animate(_rotationController);
-
-    _fadeController.repeat(reverse: true);
-    _scaleController.forward();
-  }
-
-  @override
-  void dispose() {
-    _scaleController.dispose();
-    _fadeController.dispose();
-    _rotationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: RotationTransition(
-          turns: _rotationAnimation,
-          child: widget.child,
-        ),
-      ),
+        return Stack(
+          children: [
+            _buildSquare(0, width: width, height: height, name: city.name),
+            Text("${cities.indexOf(city) + (index * 10) + 1}"),
+          ],
+        );
+      }).toList(),
     );
   }
 }
@@ -456,9 +339,7 @@ Widget playerEye() {
   );
 }
 
-Widget cityColumn(
-  List<Player> players, {
-  int playerPosition = -1,
+Widget cityColumn({
   int index = 0,
 }) {
   List<Widget> children = List.generate(
@@ -469,7 +350,6 @@ Widget cityColumn(
   );
 
   bool reverseOrder = index == 3;
-  final curentPlayer = players[playerPosition];
 
   return Column(
     verticalDirection:
@@ -480,24 +360,12 @@ Widget cityColumn(
 
       return Stack(
         children: [
-          if (curentPlayer.position == children.indexOf(child) + (index * 10))
-            Transform.scale(
-              scaleX: 1,
-              child: Container(
-                child: Transform.rotate(
-                  angle: -pi / 2,
-                  child: _buildSquare(0, width: width, height: height),
-                ),
-              ),
-            )
-          else
-            Container(
-              child: Transform.rotate(
-                angle: -pi / 2,
-                child: _buildSquare(0, width: width, height: height),
-              ),
+          Container(
+            child: Transform.rotate(
+              angle: -pi / 2,
+              child: _buildSquare(0, width: width, height: height),
             ),
-          // playerBox(players, curentPlayer, cellIndex, index),
+          ),
           Text("${children.indexOf(child) + (index * 10) + 1}")
         ],
       );
@@ -505,11 +373,17 @@ Widget cityColumn(
   );
 }
 
-Widget _buildSquare(int index, {double width = 80, double height = 50}) {
+Widget _buildSquare(int index,
+    {double width = 80, double height = 50, String name = ""}) {
   return BlurryContainer(
-      width: width,
-      height: height,
-      blurStrength: 2,
-      image: 'assets/images/spain.png',
-      child: SizedBox());
+    width: width,
+    height: height,
+    blurStrength: 2,
+    image: 'assets/images/spain.png',
+    child: Text(
+      name,
+      style: TextStyle(fontSize: 11, color: Colors.white),
+      softWrap: true,
+    ),
+  );
 }
