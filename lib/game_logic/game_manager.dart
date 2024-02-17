@@ -2,7 +2,9 @@
 
 import 'dart:math';
 
+import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/player.dart';
+import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 
 const gridWidth = 11;
@@ -10,14 +12,18 @@ const gridWidth = 11;
 class GameManager {
   static final _instance = GameManager._init();
   factory GameManager() => _instance;
-
+  bool gameStarted = false;
+  bool gameEnded = false;
+  bool rolledDice = false;
+  bool canBuyProperty = false;
+  int doublesCount = 0;
   List<Player> players = const [];
   Player currentPlayer =
-      Player(name: '', money: 0, index: 0, color: Colors.blue);
+      Player(name: '', money: 0, index: -1, color: Colors.blue);
 
   GameManager._init() {
     players = [];
-    currentPlayer = Player(name: '', money: 0, index: 0, color: Colors.blue);
+    currentPlayer = Player(name: '', money: 0, index: -1, color: Colors.blue);
   }
 
   void setPlayers(int numberOfPlayers) {
@@ -32,6 +38,8 @@ class GameManager {
   }
 
   void startGame() {
+    gameStarted = true;
+    currentPlayer = players[0];
     print("Game started");
   }
 
@@ -46,11 +54,43 @@ class GameManager {
     updatePosition(currentPlayer.xPosition, currentPlayer.yPosition,
         currentPlayer.position);
 
+    if (firstDie == secondDie) {
+      rolledDice = false;
+      doublesCount++;
+    } else {
+      rolledDice = true;
+      doublesCount = 0;
+    }
+    if (doublesCount == 3) {
+      rolledDice = true;
+      doublesCount = 0;
+      currentPlayer.position = 10;
+      updatePosition(currentPlayer.xPosition, currentPlayer.yPosition, 10);
+      print(
+          "Player ${currentPlayer.name} rolled doubles 3 times in a row, go to jail");
+    }
+    CellType cellType = board[currentPlayer.position].type;
+    if (cellType == CellType.property ||
+        cellType == CellType.utility ||
+        cellType == CellType.railroad) {
+      canBuyProperty = true;
+    } else {
+      canBuyProperty = false;
+    }
+
     return (firstDie, secondDie);
+  }
+
+  void buyProperty() {
+    canBuyProperty = false;
+    print(
+        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}");
   }
 
   void endTurn() {
     currentPlayer = _nextPlayer();
+    rolledDice = false;
+    canBuyProperty = false;
   }
 
   Player _nextPlayer() {

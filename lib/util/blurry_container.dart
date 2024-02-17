@@ -6,8 +6,11 @@ class BlurryContainer extends StatelessWidget {
   final double width;
   final double height;
   final double blurStrength;
-  final Widget child;
   final String image;
+  final int? price;
+
+  final Widget child;
+  final Widget? centerChild;
 
   const BlurryContainer(
       {super.key,
@@ -15,18 +18,29 @@ class BlurryContainer extends StatelessWidget {
       required this.height,
       required this.blurStrength,
       required this.child,
-      required this.image});
+      required this.image,
+      this.centerChild,
+      required this.price});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(0.5),
+        //     spreadRadius: 2,
+        //     blurRadius: 2,
+        //     offset: const Offset(0, 0),
+        //   ),
+        // ],
         border: Border.all(
             color: Colors.black,
             width: 1,
             strokeAlign: BorderSide.strokeAlignCenter),
       ),
       child: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(0),
@@ -45,11 +59,30 @@ class BlurryContainer extends StatelessWidget {
               child: Container(
                 width: width,
                 height: height,
-                color: Colors.black.withOpacity(0.3),
-                child: child,
+                color: Colors.black.withOpacity(0.4),
+                child: centerChild ?? Container(),
               ),
             ),
           ),
+          if (price != null)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                // height: 10,
+                child: Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: Text(
+                    "\$$price",
+                    style: const TextStyle(color: Colors.white, fontSize: 9),
+                  ),
+                ),
+              ),
+            ),
+          SizedBox(height: height, width: width, child: child),
         ],
       ),
     );

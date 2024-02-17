@@ -1,4 +1,5 @@
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/property.dart';
 
 List<Cell> board = [
   Cell(
@@ -6,10 +7,12 @@ List<Cell> board = [
       imageName: 'assets/images/jail.png',
       index: 0,
       type: CellType.start),
-  Cell(
+  Property(
       imageName: "assets/images/spain.png",
       name: "Madrid",
       index: 1,
+      cost: 100,
+      rent: 10,
       type: CellType.property),
   Cell(
       imageName: "assets/images/jail.png",

@@ -1,4 +1,5 @@
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 
 const cardWidth = 160.0;
@@ -6,12 +7,16 @@ const cardHeight = 200.0;
 const flagSize = 60.0;
 
 class CellDetails extends StatelessWidget {
-  final Cell cell;
+  final int cardIndex;
   final VoidCallback onClose;
-  const CellDetails({super.key, required this.cell, required this.onClose});
+
+  const CellDetails(
+      {super.key, required this.cardIndex, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
+    Cell cell = board[cardIndex];
+
     return Container(
       width: cardWidth,
       height: cardHeight,
@@ -35,9 +40,7 @@ class CellDetails extends StatelessWidget {
             right: -5,
             child: IconButton(
               icon: const Icon(Icons.close),
-              onPressed: () {
-                onClose();
-              },
+              onPressed: onClose,
             ),
           ),
           Padding(
@@ -71,7 +74,11 @@ class CellDetails extends StatelessWidget {
               ),
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(flagSize),
-                  child: Image.asset(cell.imageName, height: flagSize)),
+                  child: Image.asset(
+                    cell.imageName,
+                    height: flagSize,
+                    width: flagSize,
+                  )),
             ),
           ),
         ],
