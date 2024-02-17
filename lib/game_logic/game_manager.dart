@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/player.dart';
+import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 
@@ -46,7 +47,8 @@ class GameManager {
   (int, int) rollDice() {
     var firstDie = Random().nextInt(6) + 1;
     var secondDie = Random().nextInt(6) + 1;
-
+    // var firstDie = 4;
+    // var secondDie = 5;
     currentPlayer.position =
         (currentPlayer.position + (firstDie + secondDie)) % 40;
     print(
@@ -70,9 +72,10 @@ class GameManager {
           "Player ${currentPlayer.name} rolled doubles 3 times in a row, go to jail");
     }
     CellType cellType = board[currentPlayer.position].type;
-    if (cellType == CellType.property ||
-        cellType == CellType.utility ||
-        cellType == CellType.railroad) {
+    if ((cellType == CellType.property ||
+            cellType == CellType.utility ||
+            cellType == CellType.railroad) &&
+        (board[currentPlayer.position] as Property).owner == null) {
       canBuyProperty = true;
     } else {
       canBuyProperty = false;
@@ -82,9 +85,18 @@ class GameManager {
   }
 
   void buyProperty() {
+    Property property = board[currentPlayer.position] as Property;
+
     canBuyProperty = false;
+    currentPlayer.money -= (board[currentPlayer.position] as Property).cost;
+    currentPlayer.properties.add(board[currentPlayer.position] as Property);
+    property.owner = currentPlayer;
+    List<String> properties = currentPlayer.properties
+        .map((property) => property.name)
+        .toList()
+        .cast<String>();
     print(
-        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}");
+        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}, ${currentPlayer.name} now has $properties, ${property.name} is owned by ${property.owner?.name}");
   }
 
   void endTurn() {

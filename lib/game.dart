@@ -2,6 +2,7 @@
 
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/util/blurry_container.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/util/cell_details.dart';
@@ -28,7 +29,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    gameManager.setPlayers(2);
+    gameManager.setPlayers(4);
   }
 
   void rollDice() {
@@ -64,7 +65,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Color(int.parse("0xFF130F1D")),
+        color: Color(int.parse("0xFF130F3D")),
         child: Row(
           children: [
             Padding(
@@ -107,22 +108,22 @@ class _GameScreenState extends State<GameScreen> {
                               startGame: startGame,
                             ).inGridArea("content"),
                             jail(gameManager: gameManager).inGridArea('go'),
-                            cityRow(
+                            BoardRow(
                                 index: 0,
                                 cities: board.sublist(1, 10),
                                 onCityClick: ((index) =>
                                     onCityClick(index))).inGridArea('city1'),
-                            cityColumn(
+                            BoardColumn(
                                 index: 1,
                                 cities: board.sublist(11, 20),
                                 onCityClick: ((index) =>
                                     onCityClick(index))).inGridArea('city2'),
-                            cityRow(
+                            BoardRow(
                                 index: 2,
                                 cities: board.sublist(21, 30),
                                 onCityClick: ((index) =>
                                     onCityClick(index))).inGridArea('city4'),
-                            cityColumn(
+                            BoardColumn(
                                 index: 3,
                                 cities: board.sublist(31),
                                 onCityClick: ((index) =>
@@ -203,16 +204,63 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
-            if (infoCardOpen)
-              CellDetails(
-                cardIndex: infoCardIndex,
-                onClose: () {
-                  setState(() {
-                    infoCardOpen = false;
-                    print("closed");
-                  });
-                },
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey.shade900,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      width: 160,
+                      child: Column(
+                        children: [
+                          ...gameManager.players.map((player) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  playerModel(player.color),
+                                  Text(player.name,
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.white)),
+                                  Text(
+                                    "\$${player.money}",
+                                    style: const TextStyle(
+                                        fontSize: 12, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      )),
+                ),
+                if (infoCardOpen)
+                  CellDetails(
+                    cardIndex: infoCardIndex,
+                    onClose: () {
+                      setState(() {
+                        infoCardOpen = false;
+                        print("closed");
+                      });
+                    },
+                  ),
+              ],
+            )
           ],
         ),
       ),
@@ -327,107 +375,133 @@ Widget jail({GameManager? gameManager}) {
   );
 }
 
-Widget cityRow({
-  int index = 0,
-  required List<Cell> cities,
-  required Function(int index) onCityClick,
-}) {
-  bool reverseOrder = index == 2;
+class BoardRow extends StatelessWidget {
+  final int index;
+  final List<Cell> cities;
+  final Function(int index) onCityClick;
 
-  return Row(
-    textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
-    children: cities.map(
-      (city) {
+  const BoardRow(
+      {super.key,
+      required this.index,
+      required this.cities,
+      required this.onCityClick});
+
+  @override
+  Widget build(BuildContext context) {
+    bool reverseOrder = index == 2;
+
+    return Row(
+      textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
+      children: cities.map(
+        (city) {
+          int cellIndex = cities.indexOf(city) + (index * 10);
+          int? price = city.type == CellType.property ||
+                  city.type == CellType.railroad ||
+                  city.type == CellType.utility
+              ? (city as Property).cost
+              : null;
+
+          return GestureDetector(
+            onTap: () {
+              onCityClick(cellIndex + 1);
+            },
+            child: Container(
+              child: Stack(
+                children: [
+                  _buildSquare(
+                    0,
+                    width: width,
+                    height: height,
+                    price: price,
+                    name: city.name,
+                    image: city.imageName,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ).toList(),
+    );
+  }
+}
+
+class BoardColumn extends StatelessWidget {
+  final int index;
+  final List<Cell> cities;
+  final Function(int index) onCityClick;
+
+  const BoardColumn(
+      {super.key,
+      required this.index,
+      required this.cities,
+      required this.onCityClick});
+
+  @override
+  Widget build(BuildContext context) {
+    bool reverseOrder = index == 3;
+    double angle = 0;
+    if (index == 1) {
+      angle = -pi / 2;
+    } else if (index == 3) {
+      angle = pi / 2;
+    }
+    return Column(
+      key: ValueKey(index),
+      verticalDirection:
+          reverseOrder ? VerticalDirection.up : VerticalDirection.down,
+      textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
+      children: cities.map((city) {
         int cellIndex = cities.indexOf(city) + (index * 10);
-
+        int? price = city.type == CellType.property ||
+                city.type == CellType.railroad ||
+                city.type == CellType.utility
+            ? (city as Property).cost
+            : null;
         return GestureDetector(
           onTap: () {
             onCityClick(cellIndex + 1);
           },
-          child: Container(
+          child: Transform.rotate(
+            angle: angle,
             child: Stack(
               children: [
-                _buildSquare(
-                  0,
-                  width: width,
-                  height: height,
-                  price: 130,
-                  name: city.name,
-                  image: city.imageName,
+                Container(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      _buildSquare(0,
+                          price: price,
+                          image: city.imageName,
+                          width: width,
+                          height: height,
+                          name: city.name),
+                      // uncomment this to show the country flag on the cell
+                      // if (city.type == CellType.property)
+                      //   Positioned(
+                      //     top: -10,
+                      //     left: 10,
+                      //     child: SizedBox(
+                      //       width: 24,
+                      //       height: 24,
+                      //       child: ClipRRect(
+                      //         borderRadius: BorderRadius.circular(20),
+                      //         child: Image(
+                      //           image: AssetImage(city.imageName),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   )
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         );
-      },
-    ).toList(),
-  );
-}
-
-Widget cityColumn(
-    {int index = 0,
-    required List<Cell> cities,
-    required Function(int index) onCityClick}) {
-  bool reverseOrder = index == 3;
-  double angle = 0;
-  if (index == 1) {
-    angle = -pi / 2;
-  } else if (index == 3) {
-    angle = pi / 2;
+      }).toList(),
+    );
   }
-
-  return Column(
-    key: ValueKey(index),
-    verticalDirection:
-        reverseOrder ? VerticalDirection.up : VerticalDirection.down,
-    textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
-    children: cities.map((city) {
-      int cellIndex = cities.indexOf(city) + (index * 10);
-      // int? price =
-      //     city.type == CellType.property ? (city as Property).cost : null;
-      return GestureDetector(
-        onTap: () {
-          onCityClick(cellIndex + 1);
-        },
-        child: Transform.rotate(
-          angle: angle,
-          child: Stack(
-            children: [
-              Container(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    _buildSquare(0,
-                        price: 200,
-                        image: city.imageName,
-                        width: width,
-                        height: height,
-                        name: city.name),
-                    // uncomment this to show the country flag on the cell
-                    // if (city.type == CellType.property)
-                    //   Positioned(
-                    //     top: -10,
-                    //     left: 10,
-                    //     child: SizedBox(
-                    //       width: 24,
-                    //       height: 24,
-                    //       child: ClipRRect(
-                    //         borderRadius: BorderRadius.circular(20),
-                    //         child: Image(
-                    //           image: AssetImage(city.imageName),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }).toList(),
-  );
 }
 
 Widget _buildSquare(int index,

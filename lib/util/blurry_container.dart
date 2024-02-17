@@ -34,6 +34,7 @@ class BlurryContainer extends StatelessWidget {
         //     offset: const Offset(0, 0),
         //   ),
         // ],
+
         border: Border.all(
             color: Colors.black,
             width: 1,
@@ -82,6 +83,16 @@ class BlurryContainer extends StatelessWidget {
                 ),
               ),
             ),
+          // Container(
+          //   decoration: const BoxDecoration(
+          //     color: Colors.deepOrangeAccent,
+          //     borderRadius: BorderRadius.only(
+          //       topLeft: Radius.circular(5),
+          //       topRight: Radius.circular(5),
+          //     ),
+          //   ),
+          //   height: 8,
+          // ),
           SizedBox(height: height, width: width, child: child),
         ],
       ),
