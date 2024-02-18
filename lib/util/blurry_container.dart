@@ -1,26 +1,27 @@
 import 'dart:ui';
 
+import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/property.dart';
 import 'package:flutter/material.dart';
 
 class BlurryContainer extends StatelessWidget {
   final double width;
   final double height;
   final double blurStrength;
-  final String image;
-  final int? price;
+  final Cell cell;
 
   final Widget child;
   final Widget? centerChild;
 
-  const BlurryContainer(
-      {super.key,
-      required this.width,
-      required this.height,
-      required this.blurStrength,
-      required this.child,
-      required this.image,
-      this.centerChild,
-      required this.price});
+  const BlurryContainer({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.blurStrength,
+    required this.child,
+    required this.cell,
+    this.centerChild,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,7 @@ class BlurryContainer extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(0),
             child: Image.asset(
-              image,
+              cell.imageName,
               width: width,
               height: height,
               fit: BoxFit.cover,
@@ -65,7 +66,10 @@ class BlurryContainer extends StatelessWidget {
               ),
             ),
           ),
-          if (price != null)
+          if ((cell.type == CellType.property ||
+                  cell.type == CellType.utility ||
+                  cell.type == CellType.railroad) &&
+              (cell as Property).owner == null)
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -73,26 +77,39 @@ class BlurryContainer extends StatelessWidget {
                   color: Colors.black.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                // height: 10,
                 child: Padding(
-                  padding: const EdgeInsets.all(2),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 1, horizontal: 2),
                   child: Text(
-                    "\$$price",
-                    style: const TextStyle(color: Colors.white, fontSize: 9),
+                    "\$${(cell as Property).cost}",
+                    style: const TextStyle(color: Colors.white, fontSize: 11),
                   ),
                 ),
               ),
             ),
-          // Container(
-          //   decoration: const BoxDecoration(
-          //     color: Colors.deepOrangeAccent,
-          //     borderRadius: BorderRadius.only(
-          //       topLeft: Radius.circular(5),
-          //       topRight: Radius.circular(5),
-          //     ),
-          //   ),
-          //   height: 8,
-          // ),
+          if ((cell.type == CellType.property ||
+                  cell.type == CellType.utility ||
+                  cell.type == CellType.railroad) &&
+              (cell as Property).owner != null)
+            Container(
+              height: 8,
+              width: width,
+              decoration: BoxDecoration(
+                color: (cell as Property).owner!.color,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 2,
+                    offset: const Offset(0, 0),
+                  ),
+                ],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(5),
+                  topRight: Radius.circular(5),
+                ),
+              ),
+            ),
           SizedBox(height: height, width: width, child: child),
         ],
       ),

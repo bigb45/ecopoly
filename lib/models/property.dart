@@ -2,8 +2,8 @@ import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/player.dart';
 
 class Property extends Cell {
-  int cost;
-  int rent;
+  final int cost;
+  final int rent;
   Player? owner;
   Property(
       {required this.cost,

@@ -315,7 +315,7 @@ Widget content({
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.white),
                   ),
-                  onPressed: gameManager.rolledDice
+                  onPressed: gameManager.currentPlayer.money >= 0
                       ? () {
                           endTurn();
                         }
@@ -331,7 +331,10 @@ Widget content({
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                     ),
-                    onPressed: gameManager.canBuyProperty
+                    onPressed: gameManager.currentPlayer.money >=
+                            (board[gameManager.currentPlayer.position]
+                                    as Property)
+                                .cost
                         ? () {
                             buyProperty();
                           }
@@ -362,8 +365,7 @@ Widget jail({GameManager? gameManager}) {
     width: width,
     height: height,
     blurStrength: 0,
-    price: null,
-    image: 'assets/images/jail.png',
+    cell: board[0],
     child: Text(
       'Jail',
       style: TextStyle(
@@ -395,11 +397,6 @@ class BoardRow extends StatelessWidget {
       children: cities.map(
         (city) {
           int cellIndex = cities.indexOf(city) + (index * 10);
-          int? price = city.type == CellType.property ||
-                  city.type == CellType.railroad ||
-                  city.type == CellType.utility
-              ? (city as Property).cost
-              : null;
 
           return GestureDetector(
             onTap: () {
@@ -409,12 +406,9 @@ class BoardRow extends StatelessWidget {
               child: Stack(
                 children: [
                   _buildSquare(
-                    0,
+                    cell: city,
                     width: width,
                     height: height,
-                    price: price,
-                    name: city.name,
-                    image: city.imageName,
                   ),
                 ],
               ),
@@ -453,11 +447,7 @@ class BoardColumn extends StatelessWidget {
       textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
       children: cities.map((city) {
         int cellIndex = cities.indexOf(city) + (index * 10);
-        int? price = city.type == CellType.property ||
-                city.type == CellType.railroad ||
-                city.type == CellType.utility
-            ? (city as Property).cost
-            : null;
+
         return GestureDetector(
           onTap: () {
             onCityClick(cellIndex + 1);
@@ -470,12 +460,11 @@ class BoardColumn extends StatelessWidget {
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      _buildSquare(0,
-                          price: price,
-                          image: city.imageName,
-                          width: width,
-                          height: height,
-                          name: city.name),
+                      _buildSquare(
+                        cell: city,
+                        width: width,
+                        height: height,
+                      ),
                       // uncomment this to show the country flag on the cell
                       // if (city.type == CellType.property)
                       //   Positioned(
@@ -504,13 +493,8 @@ class BoardColumn extends StatelessWidget {
   }
 }
 
-Widget _buildSquare(int index,
-    {double width = 80,
-    double height = 50,
-    String name = "",
-    String? image,
-    int? price}) {
-  image ??= 'assets/images/spain.png';
+Widget _buildSquare(
+    {double width = 80, double height = 50, required Cell cell}) {
   return Stack(
     alignment: Alignment.bottomCenter,
     children: [
@@ -518,10 +502,9 @@ Widget _buildSquare(int index,
         width: width,
         height: height,
         blurStrength: 2,
-        image: image,
-        price: price,
+        cell: cell,
         child: Text(
-          name,
+          cell.name,
           style: TextStyle(
               fontSize: 10,
               color: Colors.white,

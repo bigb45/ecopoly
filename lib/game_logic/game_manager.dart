@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +33,7 @@ class GameManager {
       numberOfPlayers,
       (index) => Player(
           name: 'Player ${index + 1}',
-          money: 1500,
+          money: 1000,
           index: index,
           color: Colors.primaries[index]),
     );
@@ -48,7 +49,7 @@ class GameManager {
     var firstDie = Random().nextInt(6) + 1;
     var secondDie = Random().nextInt(6) + 1;
     // var firstDie = 4;
-    // var secondDie = 5;
+    // var secondDie = 2;
     currentPlayer.position =
         (currentPlayer.position + (firstDie + secondDie)) % 40;
     print(
@@ -80,6 +81,12 @@ class GameManager {
     } else {
       canBuyProperty = false;
     }
+    if (cellType == CellType.tax) {
+      currentPlayer.money -= (board[currentPlayer.position] as Tax).amount ??
+          ((board[currentPlayer.position] as Tax).percentage! *
+                  currentPlayer.money)
+              .round();
+    }
 
     return (firstDie, secondDie);
   }
@@ -96,7 +103,7 @@ class GameManager {
         .toList()
         .cast<String>();
     print(
-        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}, ${currentPlayer.name} now has $properties, ${property.name} is owned by ${property.owner?.name}");
+        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}, ${currentPlayer.name} now has $properties");
   }
 
   void endTurn() {
