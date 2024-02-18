@@ -70,14 +70,11 @@ class CellDetails extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(
-              top: 4,
-              right: 8,
-              left: 8,
-            ),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     cell.name,
@@ -90,6 +87,27 @@ class CellDetails extends StatelessWidget {
                   Text(
                     cell.type.name.toUpperCase(),
                     style: const TextStyle(fontSize: 10, color: Colors.white),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (cell as Property).owner?.color ??
+                            Colors.grey.shade900,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 2.0, horizontal: 6.0),
+                        child: Text(
+                          cell.owner?.name ?? "Not owned",
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   rent(
                       basePrice: (cell as Property).cost,
