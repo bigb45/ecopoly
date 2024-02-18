@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class AnimatedScale extends StatefulWidget {
+class AnimatedScaleFade extends StatefulWidget {
   final double scale;
   final Duration duration;
   final Curve curve;
   final Widget child;
-  const AnimatedScale(
+  const AnimatedScaleFade(
       {super.key,
       required this.scale,
       required this.duration,
@@ -13,10 +13,10 @@ class AnimatedScale extends StatefulWidget {
       required this.child});
 
   @override
-  State<AnimatedScale> createState() => _AnimatedScaleState();
+  State<AnimatedScaleFade> createState() => _AnimatedScaleFadeState();
 }
 
-class _AnimatedScaleState extends State<AnimatedScale>
+class _AnimatedScaleFadeState extends State<AnimatedScaleFade>
     with TickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
