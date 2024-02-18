@@ -9,6 +9,7 @@ class Player {
   int position = 0;
   int xPosition = 0;
   int yPosition = 0;
+  bool isInJail = false;
   final int index;
   final Color color;
   Player({

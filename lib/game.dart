@@ -187,7 +187,7 @@ class _GameScreenState extends State<GameScreen> {
                                   child: AnimatedScale(
                                     duration: Duration(milliseconds: 600),
                                     curve: Curves.easeInOut,
-                                    scale: 1.3,
+                                    scale: 1.4,
                                     child: Transform.rotate(
                                       angle: playerDirection,
                                       child: playerModel(player.color),
