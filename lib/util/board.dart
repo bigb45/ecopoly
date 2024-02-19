@@ -191,7 +191,7 @@ List<Cell> board = [
       cost: 150,
       rent: 20,
       imageName: "assets/images/jail.png",
-      name: "HydroVista",
+      name: "GoldWind Energy",
       index: 28,
       type: CellType.utility),
   Property(

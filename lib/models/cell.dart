@@ -3,7 +3,6 @@ class Cell {
   String imageName;
   int index;
   CellType type;
-
   Cell(
       {required this.imageName,
       required this.name,

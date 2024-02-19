@@ -2,15 +2,16 @@
 
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/cell.dart';
-import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/property.dart';
-import 'package:ecopoly/util/blurry_container.dart';
+import 'package:ecopoly/widgets/blurry_container.dart';
 import 'package:ecopoly/util/board.dart';
-import 'package:ecopoly/util/cell_details.dart';
-import 'package:ecopoly/util/animated_scale_fade.dart';
+import 'package:ecopoly/widgets/cell_details.dart';
+import 'package:ecopoly/animations/animated_scale_fade.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import "dart:math";
+
+import 'widgets/players_information.dart';
 
 const double width = 40;
 const double height = 40;
@@ -18,7 +19,11 @@ const playerSize = 18.0;
 const gridWidth = 11;
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  final TransformationController interactiveBoardController;
+  const GameScreen({
+    super.key,
+    required this.interactiveBoardController,
+  });
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -36,6 +41,12 @@ class _GameScreenState extends State<GameScreen> {
 
   void rollDice() {
     gameManager.rollDice();
+    double x = gameManager.currentPlayer.xPosition.toDouble();
+    double y = gameManager.currentPlayer.yPosition.toDouble();
+    // widget.interactiveBoardController.value =
+    //     Matrix4.diagonal3Values(1.5, 1.5, 1);
+    // widget.interactiveBoardController.value =
+    //     widget.interactiveBoardController.value..translate(x * -10, y * -20, 0);
     setState(() {});
   }
 
@@ -224,81 +235,6 @@ class _GameScreenState extends State<GameScreen> {
                   ),
               ],
             )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PlayersInformation extends StatelessWidget {
-  final List<Player> players;
-  int currentPlayerIndex = 0;
-  PlayersInformation({
-    super.key,
-    required this.players,
-    required this.currentPlayerIndex,
-  });
-  @override
-  Widget build(BuildContext context) {
-    const rowHeight = 35.0;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 160,
-        height: players.length * rowHeight,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.grey.shade900,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            AnimatedPositioned(
-              duration: Duration(milliseconds: 300),
-              top: rowHeight * currentPlayerIndex,
-              left: 1,
-              right: 1,
-              child: Container(
-                height: rowHeight,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.white.withOpacity(0.2),
-                ),
-              ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ...players.map((player) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        playerModel(player.color),
-                        Text(player.name,
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.white)),
-                        Text(
-                          "\$${player.money}",
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ],
-            ),
           ],
         ),
       ),

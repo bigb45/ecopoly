@@ -1,3 +1,4 @@
+import 'package:ecopoly/animations/animated_zoom_pan.dart';
 import 'package:ecopoly/game.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,11 +15,12 @@ Future<void> main() async {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final boardTransformationController = TransformationController();
+  MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -29,7 +31,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: InteractiveViewer(child: GameScreen()),
+      home: AnimatedZoomPan(
+        transformationController: boardTransformationController,
+        child: InteractiveViewer(
+          transformationController: boardTransformationController,
+          child: GameScreen(
+            interactiveBoardController: boardTransformationController,
+          ),
+        ),
+      ),
     );
   }
 }

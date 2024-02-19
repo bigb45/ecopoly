@@ -87,20 +87,20 @@ class GameManager {
     final isProperty = (cellType == CellType.property ||
         cellType == CellType.utility ||
         cellType == CellType.railroad);
-
-    // if the player passes go
-    if (prevPosition > currentPlayer.position) {
-      currentPlayer.money += 200;
-      print("Player ${currentPlayer.name} passed go, received 200");
-    }
-
-    // if the player lands on property
     if (isProperty &&
         (board[currentPlayer.position] as Property).owner == null) {
       canBuyProperty = true;
     } else {
       canBuyProperty = false;
     }
+    // if the player passes go
+    if (prevPosition > currentPlayer.position && currentPlayer.position != 0) {
+      currentPlayer.money += 200;
+      print("Player ${currentPlayer.name} passed go, received 200");
+      return;
+    }
+
+    // if the player lands on property
 
     // if the player lands on tax
     if (cellType == CellType.tax) {
@@ -137,7 +137,7 @@ class GameManager {
     // if the player lands on go
     if (cellType == CellType.start) {
       currentPlayer.money += 300;
-      print("Player ${currentPlayer.name} landed on go, received 200");
+      print("Player ${currentPlayer.name} landed ON go, received 300");
       return;
     }
   }
