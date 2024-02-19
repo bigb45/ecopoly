@@ -40,7 +40,7 @@ dependencies:
   flutter_layout_grid: ^2.0.0
   scidart: 0.0.2-dev.12
   firebase_messaging: ^13.0.4
-
+  animated_digit: ^3.2.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
