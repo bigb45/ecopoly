@@ -221,8 +221,32 @@ class _GameScreenState extends State<GameScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 PlayersInformation(
-                    players: gameManager.players,
-                    currentPlayerIndex: gameManager.currentPlayer.index),
+                  players: gameManager.players,
+                  currentPlayerIndex: gameManager.currentPlayer.index,
+                  onPlayerClick: (player) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => (Dialog(
+                        child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            // add buttons to offer trade
+                            child: Column(
+                              children: [
+                                Text(player.name),
+                                Text(player.money.toString()),
+                                Row(
+                                  children: [
+                                    TextButton(
+                                        onPressed: null,
+                                        child: Text("Offer trade"))
+                                  ],
+                                )
+                              ],
+                            )),
+                      )),
+                    );
+                  },
+                ),
                 if (infoCardOpen)
                   CellDetails(
                     cardIndex: infoCardIndex,

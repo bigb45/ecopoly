@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 
 class PlayersInformation extends StatelessWidget {
   final List<Player> players;
+  Function(Player player) onPlayerClick;
   int currentPlayerIndex = 0;
   PlayersInformation({
     super.key,
     required this.players,
     required this.currentPlayerIndex,
+    required this.onPlayerClick,
   });
   @override
   Widget build(BuildContext context) {
@@ -52,30 +54,33 @@ class PlayersInformation extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ...players.map((player) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        playerModel(player.color),
-                        Text(player.name,
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.white)),
-                        AnimatedDigitWidget(
-                          textStyle: const TextStyle(
-                              fontSize: 12, color: Colors.green),
-                          prefix: "\$",
-                          value: player.money,
-                          duration: const Duration(milliseconds: 1000),
-                          valueColors: [
-                            ValueColor(
-                              condition: () => player.money <= 0,
-                              color: Colors.red,
-                            ),
-                          ],
-                        ),
-                      ],
+                  return GestureDetector(
+                    onTap: () => onPlayerClick(player),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          playerModel(player.color),
+                          Text(player.name,
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.white)),
+                          AnimatedDigitWidget(
+                            textStyle: const TextStyle(
+                                fontSize: 12, color: Colors.green),
+                            prefix: "\$",
+                            value: player.money,
+                            duration: const Duration(milliseconds: 1000),
+                            valueColors: [
+                              ValueColor(
+                                condition: () => player.money <= 0,
+                                color: Colors.red,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }).toList(),
