@@ -13,8 +13,8 @@ import "dart:math";
 
 import 'widgets/players_information.dart';
 
-const double width = 40;
-const double height = 40;
+const double width = 80;
+const double height = 60;
 const playerSize = 18.0;
 const gridWidth = 11;
 
@@ -93,14 +93,6 @@ class _GameScreenState extends State<GameScreen> {
                           color:
                               ColorScheme.fromSeed(seedColor: Colors.deepPurple)
                                   .primaryContainer,
-                          // boxShadow: [
-                          //   BoxShadow(
-                          //     color: Colors.black.withOpacity(0.5),
-                          //     spreadRadius: 5,
-                          //     blurRadius: 7,
-                          //     offset: const Offset(0, 3),
-                          //   ),
-                          // ],
                         ),
                         child: LayoutGrid(
                           areas: '''
@@ -155,23 +147,23 @@ class _GameScreenState extends State<GameScreen> {
                             builder: (context) {
                               if (player.index !=
                                   gameManager.currentPlayer.index) {
-                                // TODO: make this based on the number of players in the cell instead of absolute index
                                 int yOffset = switch (player.index) {
-                                  0 => -10,
-                                  1 => 10,
-                                  2 => -10,
-                                  3 => 10,
+                                  0 => -20,
+                                  1 => 20,
+                                  2 => -20,
+                                  3 => 20,
                                   int() => 0
                                 };
                                 int xOffset = switch (player.index) {
-                                  0 => -10,
-                                  1 => 10,
-                                  2 => 10,
-                                  3 => -10,
+                                  0 => -15,
+                                  1 => 15,
+                                  2 => 15,
+                                  3 => -15,
                                   int() => 0
                                 };
+                                int inJailOffset = player.isInJail ? 20 : 0;
                                 return AnimatedPositioned(
-                                  duration: Duration(milliseconds: 400),
+                                  duration: Duration(milliseconds: 600),
                                   curve: Curves.easeInOut,
                                   top: ((width - playerSize) / 2) +
                                       width * player.yPosition +
@@ -186,7 +178,9 @@ class _GameScreenState extends State<GameScreen> {
                                     child: playerModel(player.color),
                                   ),
                                 );
-                              } else {
+                              }
+                              // return SizedBox();
+                              else {
                                 // TODO: place this outside the list in order to place the current player on top of others
                                 return AnimatedPositioned(
                                   duration: Duration(milliseconds: 600),
@@ -250,41 +244,47 @@ class _GameScreenState extends State<GameScreen> {
                     );
                   },
                 ),
-                ElevatedButton(
-                    onPressed: () => showDialog(
-                          context: context,
-                          builder: (BuildContext context) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AlertDialog(
-                              actionsAlignment: MainAxisAlignment.center,
-                              content:
-                                  Text("Are you sure you want to Bankrupt?"),
-                              actions: [
-                                ElevatedButton(
-                                  onPressed: () => {Navigator.pop(context)},
-                                  child: Text("Cancel"),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    // TODO: replace the index with the actual player's index
-                                    gameManager
-                                        .quit(gameManager.currentPlayer.index);
-                                    Navigator.pop(context);
-                                    setState(() {});
-                                  },
-                                  child: Text(
-                                    "Bankrupt",
-                                    style: TextStyle(
-                                        color: ColorScheme.fromSeed(
-                                                seedColor: Colors.deepPurple)
-                                            .error),
+                if (gameManager.gameStarted)
+                  ElevatedButton(
+                      onPressed: () => showDialog(
+                            context: context,
+                            builder: (BuildContext context) => Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: AlertDialog(
+                                actionsAlignment: MainAxisAlignment.center,
+                                content:
+                                    Text("Are you sure you want to Bankrupt?"),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // TODO: remove this
+                                      gameManager.sendToJail();
+                                      setState(() {});
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("Cancel"),
                                   ),
-                                ),
-                              ],
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // TODO: replace the index with the actual player's index
+                                      gameManager.quit(
+                                          gameManager.currentPlayer.index);
+                                      Navigator.pop(context);
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "Bankrupt",
+                                      style: TextStyle(
+                                          color: ColorScheme.fromSeed(
+                                                  seedColor: Colors.deepPurple)
+                                              .error),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                    child: Text("Bankrupt")),
+                      child: Text("Bankrupt")),
                 if (infoCardOpen)
                   CellDetails(
                     cardIndex: infoCardIndex,
@@ -399,7 +399,7 @@ Widget content({
 Widget jail({GameManager? gameManager}) {
   return BlurryContainer(
     width: width,
-    height: height,
+    height: width,
     blurStrength: 0,
     cell: board[0],
     child: Text(
@@ -433,7 +433,18 @@ class BoardRow extends StatelessWidget {
       children: cities.map(
         (city) {
           int cellIndex = cities.indexOf(city) + (index * 10);
-
+          Widget? centerChild = switch (city.type) {
+            CellType.communityChest => Image.asset(city.imageName),
+            CellType.chance => Image.asset(city.imageName),
+            CellType.railroad => Image.asset(city.imageName),
+            CellType.utility => Image.asset(city.imageName),
+            CellType.tax => Image.asset(city.imageName),
+            CellType.jail => null,
+            CellType.goToJail => null,
+            CellType.freeParking => null,
+            CellType.start => null,
+            CellType.property => null,
+          };
           return GestureDetector(
             onTap: () {
               onCityClick(cellIndex + 1);
@@ -443,8 +454,9 @@ class BoardRow extends StatelessWidget {
                 children: [
                   _buildSquare(
                     cell: city,
-                    width: width,
-                    height: height,
+                    width: height,
+                    height: width,
+                    centerChild: centerChild,
                   ),
                 ],
               ),
@@ -483,13 +495,24 @@ class BoardColumn extends StatelessWidget {
       textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
       children: cities.map((city) {
         int cellIndex = cities.indexOf(city) + (index * 10);
-
+        Widget? centerChild = switch (city.type) {
+          CellType.communityChest => Image.asset(city.imageName),
+          CellType.chance => Image.asset(city.imageName),
+          CellType.railroad => Image.asset(city.imageName),
+          CellType.utility => Image.asset(city.imageName),
+          CellType.tax => Image.asset(city.imageName),
+          CellType.jail => null,
+          CellType.goToJail => null,
+          CellType.freeParking => null,
+          CellType.start => null,
+          CellType.property => null,
+        };
         return GestureDetector(
           onTap: () {
             onCityClick(cellIndex + 1);
           },
           child: Transform.rotate(
-            angle: angle,
+            angle: 0,
             child: Stack(
               children: [
                 Container(
@@ -500,9 +523,10 @@ class BoardColumn extends StatelessWidget {
                         cell: city,
                         width: width,
                         height: height,
+                        centerChild: centerChild,
                       ),
                       // uncomment this to show the country flag on the cell
-                      // if (city.type == CellType.property)
+                      // if (city.type == CellType.utility)
                       //   Positioned(
                       //     top: -10,
                       //     left: 10,
@@ -530,25 +554,32 @@ class BoardColumn extends StatelessWidget {
 }
 
 Widget _buildSquare(
-    {double width = 80, double height = 50, required Cell cell}) {
+    {double width = 80,
+    double height = 50,
+    required Cell cell,
+    Widget? centerChild}) {
   return Stack(
     alignment: Alignment.bottomCenter,
     children: [
       BlurryContainer(
         width: width,
         height: height,
-        blurStrength: 2,
+        blurStrength: 0.2,
         cell: cell,
-        child: Text(
-          cell.name,
-          style: TextStyle(
-              fontSize: 10,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              height: 1),
-          textAlign: TextAlign.center,
-          softWrap: true,
-          overflow: TextOverflow.fade,
+        centerChild: centerChild,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: Text(
+            cell.name,
+            style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                height: 1),
+            textAlign: TextAlign.center,
+            softWrap: true,
+            overflow: TextOverflow.fade,
+          ),
         ),
       ),
     ],

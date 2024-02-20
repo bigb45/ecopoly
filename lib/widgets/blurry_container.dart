@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:ecopoly/models/cell.dart';
@@ -31,13 +32,17 @@ class BlurryContainer extends StatelessWidget {
     return ClipRect(
       clipper: ClipPad(
         padding: EdgeInsets.only(
-          top: 100,
-          bottom: cell.index > 10 ? 0 : 100,
+          top: cell.index > 20 && cell.index < 29 ? 100 : 0,
+          bottom: cell.index < 11 ? 100 : 0,
+          left: cell.index > 10 && cell.index < 19 ? 100 : 0,
+          right: cell.index > 30 && cell.index < 39 ? 100 : 0,
         ),
       ),
       child: Container(
+        width: width,
+        height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.transparent,
           boxShadow: [
             BoxShadow(
               color: isProperty
@@ -45,7 +50,7 @@ class BlurryContainer extends StatelessWidget {
                   : Colors.transparent,
               spreadRadius: 10,
               blurRadius: 10,
-              offset: const Offset(0, -2),
+              offset: const Offset(0, 0),
             ),
           ],
           border: Border.all(
@@ -65,33 +70,38 @@ class BlurryContainer extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(0),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                    sigmaX: blurStrength, sigmaY: blurStrength),
-                child: Container(
-                  width: width,
-                  height: height,
-                  color: Colors.black.withOpacity(0.4),
-                  child: centerChild ?? Container(),
-                ),
-              ),
+            // ClipRRect(
+            //   borderRadius: BorderRadius.circular(0),
+            //   child: BackdropFilter(
+            //     filter: ImageFilter.blur(
+            //         sigmaX: blurStrength, sigmaY: blurStrength),
+            //     child:
+            Container(
+              width: width,
+              height: height,
+              color: Colors.black.withOpacity(0.4),
+              child: centerChild ?? Container(),
             ),
+            //   ),
+            // ),
             if (isProperty && (cell as Property).owner == null)
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 1, horizontal: 2),
-                    child: Text(
-                      "\$${(cell as Property).cost}",
-                      style: const TextStyle(color: Colors.white, fontSize: 11),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 1, horizontal: 2),
+                      child: Text(
+                        "\$${(cell as Property).cost}",
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 11),
+                      ),
                     ),
                   ),
                 ),

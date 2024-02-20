@@ -4,6 +4,7 @@ import 'package:ecopoly/models/player.dart';
 class Property extends Cell {
   final int cost;
   final int rent;
+  final setIndex;
   Player? owner;
   Property(
       {required this.cost,
@@ -11,7 +12,8 @@ class Property extends Cell {
       required super.name,
       required super.index,
       required super.type,
-      required super.imageName});
+      required super.imageName,
+      required this.setIndex});
 
   bool buyProperty(Player player) {
     if (player.money < cost) {

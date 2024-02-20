@@ -72,9 +72,7 @@ class GameManager {
     if (doublesCount == doublesLimit) {
       rolledDice = true;
       doublesCount = 0;
-      currentPlayer.position = jailPosition;
-      currentPlayer.isInJail = true;
-      updatePosition(currentPlayer.xPosition, currentPlayer.yPosition, 10);
+      sendToJail();
       print(
           "Player ${currentPlayer.name} rolled doubles 3 times in a row, go to jail");
     }
@@ -82,6 +80,14 @@ class GameManager {
     _handleNewPlayerPosition(cellType, prevPosition);
 
     return (firstDie, secondDie);
+  }
+
+  void sendToJail() {
+    currentPlayer.position = jailPosition;
+    currentPlayer.isInJail = true;
+    canBuyProperty = false;
+    updatePosition(
+        currentPlayer.xPosition, currentPlayer.yPosition, jailPosition);
   }
 
   void _handleNewPlayerPosition(CellType cellType, int prevPosition) {
@@ -95,13 +101,13 @@ class GameManager {
       canBuyProperty = false;
     }
     // if the player passes go
-    if (prevPosition > currentPlayer.position && currentPlayer.position != 0) {
+    if (prevPosition > currentPlayer.position &&
+        currentPlayer.position != 0 &&
+        !currentPlayer.isInJail) {
       currentPlayer.money += 200;
       print("Player ${currentPlayer.name} passed go, received 200");
       return;
     }
-
-    // if the player lands on property
 
     // if the player lands on tax
     if (cellType == CellType.tax) {
@@ -128,9 +134,7 @@ class GameManager {
 
     // if the player lands on go to jail
     if (cellType == CellType.goToJail) {
-      currentPlayer.position = jailPosition;
-      updatePosition(
-          currentPlayer.xPosition, currentPlayer.yPosition, jailPosition);
+      sendToJail();
       print("Player ${currentPlayer.name} landed on go to jail");
       return;
     }
@@ -174,6 +178,11 @@ class GameManager {
     }
     endTurn();
     players.remove(player);
+
+    if (players.length == 1) {
+      endGame();
+      gameEnded = true;
+    }
   }
 
   Player _nextPlayer() {
