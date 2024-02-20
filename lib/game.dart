@@ -148,29 +148,29 @@ class _GameScreenState extends State<GameScreen> {
                               if (player.index !=
                                   gameManager.currentPlayer.index) {
                                 int yOffset = switch (player.index) {
-                                  0 => -20,
-                                  1 => 20,
-                                  2 => -20,
-                                  3 => 20,
+                                  0 => -15,
+                                  1 => 15,
+                                  2 => -15,
+                                  3 => 15,
                                   int() => 0
                                 };
                                 int xOffset = switch (player.index) {
-                                  0 => -15,
-                                  1 => 15,
-                                  2 => 15,
-                                  3 => -15,
+                                  0 => -10,
+                                  1 => 10,
+                                  2 => 10,
+                                  3 => -10,
                                   int() => 0
                                 };
                                 int inJailOffset = player.isInJail ? 20 : 0;
                                 return AnimatedPositioned(
                                   duration: Duration(milliseconds: 600),
                                   curve: Curves.easeInOut,
-                                  top: ((width - playerSize) / 2) +
-                                      width * player.yPosition +
+                                  top: ((height - playerSize) / 2) +
+                                      height * player.yPosition +
                                       player.yPosition +
                                       yOffset,
-                                  left: (width - playerSize) / 2 +
-                                      width * player.xPosition +
+                                  left: (height - playerSize) / 2 +
+                                      height * player.xPosition +
                                       player.xPosition +
                                       xOffset,
                                   child: Transform.rotate(
@@ -185,12 +185,14 @@ class _GameScreenState extends State<GameScreen> {
                                 return AnimatedPositioned(
                                   duration: Duration(milliseconds: 600),
                                   curve: Curves.easeInOutCubic,
-                                  top: ((width - playerSize) / 2) +
-                                      width * player.yPosition +
-                                      player.yPosition,
-                                  left: (width - playerSize) / 2 +
-                                      width * player.xPosition +
-                                      player.xPosition,
+                                  top: ((height - playerSize) / 2) +
+                                      height * player.yPosition +
+                                      player.yPosition +
+                                      20,
+                                  left: (height - playerSize) / 2 +
+                                      height * player.xPosition +
+                                      player.xPosition +
+                                      20,
                                   child: AnimatedScaleFade(
                                     duration: Duration(milliseconds: 600),
                                     curve: Curves.easeInOut,
