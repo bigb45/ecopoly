@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:ecopoly/models/player_status.dart';
 import 'package:ecopoly/models/property.dart';
 
 class Player {
@@ -10,6 +11,7 @@ class Player {
   int xPosition = 0;
   int yPosition = 0;
   bool isInJail = false;
+  PlayerStatus status = PlayerStatus.playing;
   final int index;
   final Color color;
   Player({

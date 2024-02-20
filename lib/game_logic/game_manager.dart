@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/player.dart';
+import 'package:ecopoly/models/player_status.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/util/board.dart';
@@ -162,6 +163,17 @@ class GameManager {
     rolledDice = false;
     canBuyProperty = false;
     doublesCount = 0;
+  }
+
+  void quit(int playerIndex) {
+    print("player ${playerIndex} quit the game");
+    Player player = players.firstWhere((player) => player.index == playerIndex);
+    player.status = PlayerStatus.bankrupt;
+    for (var property in player.properties) {
+      property.owner = null;
+    }
+    endTurn();
+    players.remove(player);
   }
 
   Player _nextPlayer() {

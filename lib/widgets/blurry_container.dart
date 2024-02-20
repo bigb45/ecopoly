@@ -43,7 +43,7 @@ class BlurryContainer extends StatelessWidget {
               color: isProperty
                   ? (cell as Property).owner?.color ?? Colors.transparent
                   : Colors.transparent,
-              spreadRadius: 4,
+              spreadRadius: 10,
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),

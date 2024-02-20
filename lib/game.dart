@@ -36,7 +36,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    gameManager.setPlayers(2);
+    gameManager.setPlayers(4);
   }
 
   void rollDice() {
@@ -218,7 +218,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 PlayersInformation(
                   players: gameManager.players,
@@ -234,19 +234,57 @@ class _GameScreenState extends State<GameScreen> {
                               children: [
                                 Text(player.name),
                                 Text(player.money.toString()),
-                                Row(
-                                  children: [
-                                    TextButton(
+                                if (player.index !=
+                                    gameManager.currentPlayer.index)
+                                  Row(
+                                    children: const [
+                                      TextButton(
                                         onPressed: null,
-                                        child: Text("Offer trade"))
-                                  ],
-                                )
+                                        child: Text("Offer trade"),
+                                      ),
+                                    ],
+                                  )
                               ],
                             )),
                       )),
                     );
                   },
                 ),
+                ElevatedButton(
+                    onPressed: () => showDialog(
+                          context: context,
+                          builder: (BuildContext context) => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AlertDialog(
+                              actionsAlignment: MainAxisAlignment.center,
+                              content:
+                                  Text("Are you sure you want to Bankrupt?"),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => {Navigator.pop(context)},
+                                  child: Text("Cancel"),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // TODO: replace the index with the actual player's index
+                                    gameManager
+                                        .quit(gameManager.currentPlayer.index);
+                                    Navigator.pop(context);
+                                    setState(() {});
+                                  },
+                                  child: Text(
+                                    "Bankrupt",
+                                    style: TextStyle(
+                                        color: ColorScheme.fromSeed(
+                                                seedColor: Colors.deepPurple)
+                                            .error),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    child: Text("Bankrupt")),
                 if (infoCardOpen)
                   CellDetails(
                     cardIndex: infoCardIndex,
