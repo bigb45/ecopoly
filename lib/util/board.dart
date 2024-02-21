@@ -43,7 +43,7 @@ List<Cell> board = [
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 5,
-    type: CellType.railroad,
+    type: CellType.bikelane,
     setIndex: 8,
   ),
   Property(
@@ -59,7 +59,7 @@ List<Cell> board = [
       imageName: "assets/images/community_chest.jpg",
       name: "Charity",
       index: 7,
-      type: CellType.communityChest),
+      type: CellType.charity),
   Property(
     cost: 100,
     rent: 6,
@@ -128,7 +128,7 @@ List<Cell> board = [
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 15,
-    type: CellType.railroad,
+    type: CellType.bikelane,
     setIndex: 8,
   ),
   Property(
@@ -144,7 +144,7 @@ List<Cell> board = [
       imageName: "assets/images/community_chest.jpg",
       name: "Charity",
       index: 17,
-      type: CellType.communityChest),
+      type: CellType.charity),
   Property(
     cost: 180,
     rent: 14,
@@ -208,7 +208,7 @@ List<Cell> board = [
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 25,
-    type: CellType.railroad,
+    type: CellType.bikelane,
     setIndex: 8,
   ),
   Property(
@@ -292,14 +292,14 @@ List<Cell> board = [
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 35,
-    type: CellType.railroad,
+    type: CellType.bikelane,
     setIndex: 8,
   ),
   Cell(
       imageName: "assets/images/community_chest.jpg",
       name: "Charity",
       index: 36,
-      type: CellType.communityChest),
+      type: CellType.charity),
   Property(
     cost: 350,
     rent: 35,
@@ -312,7 +312,7 @@ List<Cell> board = [
   Tax(
     amount: 75,
     imageName: "assets/images/fixed_tax.jpg",
-    name: "Income Tax",
+    name: "Environmental Tax",
     index: 38,
   ),
   Property(

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 
@@ -69,82 +70,205 @@ class CellDetails extends StatelessWidget {
               onPressed: onClose,
             ),
           ),
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    cell.name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    cell.type.name.toUpperCase(),
-                    style: const TextStyle(fontSize: 10, color: Colors.white),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: (cell as Property).owner?.color ??
-                            Colors.grey.shade900,
-                        borderRadius: BorderRadius.circular(100),
+          if (cell.type == CellType.charity || cell.type == CellType.chance)
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      cell.name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 2.0, horizontal: 6.0),
-                        child: Text(
-                          cell.owner?.name ?? "Not owned",
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.white,
-                          ),
+                    ),
+                    Text(
+                      cell.type.name.toUpperCase(),
+                      style: const TextStyle(fontSize: 10, color: Colors.white),
+                    ),
+                    if (cell.type == CellType.charity)
+                      const Text(
+                        "Draw a card from the Community Chest",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ),
-                  rent(
-                      basePrice: (cell as Property).cost,
-                      rent: cell.rent,
-                      multiplier: 4),
-                ],
+                    if (cell.type == CellType.chance)
+                      const Text(
+                        "Draw a card from the Chance",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-          // Positioned(
-          //   top: -flagSize / 2,
-          //   left: (cardWidth - flagSize) / 2,
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.circular(flagSize),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.black.withOpacity(0.5),
-          //           spreadRadius: 2,
-          //           blurRadius: 2,
-          //           offset: const Offset(0, 0),
-          //         ),
-          //       ],
-          //     ),
-          //     child: ClipRRect(
-          //         borderRadius: BorderRadius.circular(flagSize),
-          //         child: Image.asset(
-          //           cell.imageName,
-          //           height: flagSize,
-          //           width: flagSize,
-          //         )),
-          //   ),
-          // ),
+          if (cell is Property &&
+              (cell.type != CellType.bikelane && cell.type != CellType.utility))
+            propertyInfo(cell),
+          if (cell is Tax) taxInfo(cell),
+          if (cell.type == CellType.utility) utilityInfo(cell as Property)
         ],
       ),
     );
   }
+}
+
+Widget utilityInfo(Property cell) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            cell.name,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            cell.type.name.toUpperCase(),
+            style: const TextStyle(fontSize: 10, color: Colors.white),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              decoration: BoxDecoration(
+                color: (cell).owner?.color ?? Colors.grey.shade900,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+                child: Text(
+                  cell.owner?.name ?? "Not owned",
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Text(
+            "If one Utility is owned, rent is 4x the dice roll, if both Utilities are owned, rent is 4x the dice roll",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget taxInfo(Tax cell) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            cell.name,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            cell.type.name.toUpperCase(),
+            style: const TextStyle(fontSize: 10, color: Colors.white),
+          ),
+          if (cell.amount != null)
+            Text(
+              "Pay \$${cell.amount} Environmental Tax",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          if (cell.percentage != null)
+            Text(
+              "Pay %${((cell.percentage!) * 100)} of the total money you have as Tax",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget propertyInfo(Property cell) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            cell.name,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            cell.type.name.toUpperCase(),
+            style: const TextStyle(fontSize: 10, color: Colors.white),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              decoration: BoxDecoration(
+                color: (cell).owner?.color ?? Colors.grey.shade900,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+                child: Text(
+                  cell.owner?.name ?? "Not owned",
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          rent(basePrice: (cell).cost, rent: cell.rent, multiplier: 4),
+        ],
+      ),
+    ),
+  );
 }
 
 Widget rent(

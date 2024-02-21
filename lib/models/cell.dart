@@ -12,9 +12,9 @@ class Cell {
 
 enum CellType {
   chance,
-  communityChest,
+  charity,
   property,
-  railroad,
+  bikelane,
   utility,
   tax,
   jail,

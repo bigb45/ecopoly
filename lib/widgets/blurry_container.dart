@@ -1,6 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:flutter/material.dart';
@@ -27,15 +24,15 @@ class BlurryContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isProperty = cell.type == CellType.property ||
-        cell.type == CellType.railroad ||
+        cell.type == CellType.bikelane ||
         cell.type == CellType.utility;
     return ClipRect(
       clipper: ClipPad(
         padding: EdgeInsets.only(
-          top: cell.index > 20 && cell.index < 29 ? 100 : 0,
+          top: cell.index > 20 && cell.index < 30 ? 100 : 0,
           bottom: cell.index < 11 ? 100 : 0,
-          left: cell.index > 10 && cell.index < 19 ? 100 : 0,
-          right: cell.index > 30 && cell.index < 39 ? 100 : 0,
+          left: cell.index > 10 && cell.index < 20 ? 100 : 0,
+          right: cell.index > 30 && cell.index < 40 ? 100 : 0,
         ),
       ),
       child: Container(
@@ -70,20 +67,14 @@ class BlurryContainer extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            // ClipRRect(
-            //   borderRadius: BorderRadius.circular(0),
-            //   child: BackdropFilter(
-            //     filter: ImageFilter.blur(
-            //         sigmaX: blurStrength, sigmaY: blurStrength),
-            //     child:
+
             Container(
               width: width,
               height: height,
               color: Colors.black.withOpacity(0.4),
               child: centerChild ?? Container(),
             ),
-            //   ),
-            // ),
+
             if (isProperty && (cell as Property).owner == null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4.0),

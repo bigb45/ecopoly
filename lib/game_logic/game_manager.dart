@@ -23,6 +23,8 @@ class GameManager {
   bool rolledDice = false;
   bool canBuyProperty = false;
   int doublesCount = 0;
+  var firstDie = 1;
+  var secondDie = 1;
   List<Player> players = const [];
   Player currentPlayer =
       Player(name: '', money: 0, index: -1, color: Colors.blue);
@@ -50,8 +52,8 @@ class GameManager {
   }
 
   (int, int) rollDice() {
-    var firstDie = Random().nextInt(6) + 1;
-    var secondDie = Random().nextInt(6) + 1;
+    firstDie = Random().nextInt(6) + 1;
+    secondDie = Random().nextInt(6) + 1;
     // var firstDie = 4;
     // var secondDie = 2;
     int prevPosition = currentPlayer.position;
@@ -93,7 +95,7 @@ class GameManager {
   void _handleNewPlayerPosition(CellType cellType, int prevPosition) {
     final isProperty = (cellType == CellType.property ||
         cellType == CellType.utility ||
-        cellType == CellType.railroad);
+        cellType == CellType.bikelane);
     if (isProperty &&
         (board[currentPlayer.position] as Property).owner == null) {
       canBuyProperty = true;

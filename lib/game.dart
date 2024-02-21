@@ -2,11 +2,13 @@
 
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/widgets/blurry_container.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/cell_details.dart';
 import 'package:ecopoly/animations/animated_scale_fade.dart';
+import 'package:ecopoly/widgets/dice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import "dart:math";
@@ -155,10 +157,10 @@ class _GameScreenState extends State<GameScreen> {
                                   int() => 0
                                 };
                                 int xOffset = switch (player.index) {
-                                  0 => -10,
-                                  1 => 10,
-                                  2 => 10,
-                                  3 => -10,
+                                  0 => -12,
+                                  1 => 12,
+                                  2 => 12,
+                                  3 => -12,
                                   int() => 0
                                 };
                                 int inJailOffset = player.isInJail ? 20 : 0;
@@ -168,11 +170,13 @@ class _GameScreenState extends State<GameScreen> {
                                   top: ((height - playerSize) / 2) +
                                       height * player.yPosition +
                                       player.yPosition +
-                                      yOffset,
+                                      yOffset +
+                                      10,
                                   left: (height - playerSize) / 2 +
                                       height * player.xPosition +
                                       player.xPosition +
-                                      xOffset,
+                                      xOffset +
+                                      10,
                                   child: Transform.rotate(
                                     angle: playerDirection,
                                     child: playerModel(player.color),
@@ -185,18 +189,16 @@ class _GameScreenState extends State<GameScreen> {
                                 return AnimatedPositioned(
                                   duration: Duration(milliseconds: 600),
                                   curve: Curves.easeInOutCubic,
-                                  top: ((height - playerSize) / 2) +
+                                  top: ((width - playerSize) / 2) +
                                       height * player.yPosition +
-                                      player.yPosition +
-                                      20,
-                                  left: (height - playerSize) / 2 +
+                                      player.yPosition,
+                                  left: (width - playerSize) / 2 +
                                       height * player.xPosition +
-                                      player.xPosition +
-                                      20,
+                                      player.xPosition,
                                   child: AnimatedScaleFade(
                                     duration: Duration(milliseconds: 600),
                                     curve: Curves.easeInOut,
-                                    scale: 1.4,
+                                    scale: 1.7,
                                     child: Transform.rotate(
                                       angle: playerDirection,
                                       child: playerModel(player.color),
@@ -222,27 +224,72 @@ class _GameScreenState extends State<GameScreen> {
                   onPlayerClick: (player) {
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) => (Dialog(
-                        child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            // add buttons to offer trade
-                            child: Column(
-                              children: [
-                                Text(player.name),
-                                Text(player.money.toString()),
-                                if (player.index !=
-                                    gameManager.currentPlayer.index)
-                                  Row(
-                                    children: const [
-                                      TextButton(
-                                        onPressed: null,
-                                        child: Text("Offer trade"),
-                                      ),
-                                    ],
-                                  )
-                              ],
-                            )),
-                      )),
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          scrollable: true,
+                          title: Column(children: [
+                            Text('${player.name}\'s Properties'),
+                            Text("Money: \$${player.money}",
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 14)),
+                          ]),
+                          content: SingleChildScrollView(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width *
+                                  0.4, // Adjust the width as needed
+                              padding: EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: player.properties.map((property) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(40),
+                                          child: Image.asset(
+                                            property.imageName,
+                                            width: 30,
+                                            height: 30,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          property.name,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            if (player.index != gameManager.currentPlayer.index)
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => TradeDialog(
+                                        targetPlayer: player,
+                                        currentPlayer:
+                                            gameManager.currentPlayer),
+                                  );
+                                },
+                                child: Text("Offer Trade"),
+                              ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Close'),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                 ),
@@ -259,8 +306,6 @@ class _GameScreenState extends State<GameScreen> {
                                 actions: [
                                   ElevatedButton(
                                     onPressed: () {
-                                      // TODO: remove this
-                                      gameManager.sendToJail();
                                       setState(() {});
                                       Navigator.pop(context);
                                     },
@@ -306,6 +351,135 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
+class TradeDialog extends StatefulWidget {
+  final Player currentPlayer;
+  final Player targetPlayer;
+
+  const TradeDialog({
+    Key? key,
+    required this.currentPlayer,
+    required this.targetPlayer,
+  }) : super(key: key);
+
+  @override
+  State<TradeDialog> createState() => _TradeDialogState();
+}
+
+class _TradeDialogState extends State<TradeDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(
+        "Trade Properties",
+        textAlign: TextAlign.center,
+      ),
+      content: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+                color: Colors.red,
+                child: PlayerPropertiesList(player: widget.targetPlayer)),
+            SizedBox(
+              width: 10,
+            ),
+            Container(
+                color: Colors.blue,
+                child: PlayerPropertiesList(player: widget.currentPlayer)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PlayerPropertiesList extends StatefulWidget {
+  final Player player;
+
+  const PlayerPropertiesList({
+    Key? key,
+    required this.player,
+  }) : super(key: key);
+
+  @override
+  State<PlayerPropertiesList> createState() => _PlayerPropertiesListState();
+}
+
+class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
+  Set<int> selectedIndexes = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: Text(
+            widget.player.name,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(height: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(
+            widget.player.properties.length,
+            (index) {
+              final property = widget.player.properties[index];
+              final isSelected = selectedIndexes.contains(index);
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isSelected) {
+                      selectedIndexes.remove(index);
+                    } else {
+                      selectedIndexes.add(index);
+                    }
+                  });
+                },
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  margin: EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected ? Colors.purpleAccent : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(40),
+                        child: Image.asset(
+                          property.imageName,
+                          width: 15,
+                          height: 15,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        property.name,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 Widget content({
   required GameManager gameManager,
   required VoidCallback rollDice,
@@ -314,11 +488,16 @@ Widget content({
   required VoidCallback startGame,
 }) {
   return Container(
-    color: Color(int.parse("0xFF130F1D")),
+    color: Color(int.parse("0xFF130F2D")),
     child: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Dice(value: 2),
+            SizedBox(width: 20),
+            Dice(value: 2),
+          ]),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -436,9 +615,9 @@ class BoardRow extends StatelessWidget {
         (city) {
           int cellIndex = cities.indexOf(city) + (index * 10);
           Widget? centerChild = switch (city.type) {
-            CellType.communityChest => Image.asset(city.imageName),
+            CellType.charity => Image.asset(city.imageName),
             CellType.chance => Image.asset(city.imageName),
-            CellType.railroad => Image.asset(city.imageName),
+            CellType.bikelane => Image.asset(city.imageName),
             CellType.utility => Image.asset(city.imageName),
             CellType.tax => Image.asset(city.imageName),
             CellType.jail => null,
@@ -498,9 +677,9 @@ class BoardColumn extends StatelessWidget {
       children: cities.map((city) {
         int cellIndex = cities.indexOf(city) + (index * 10);
         Widget? centerChild = switch (city.type) {
-          CellType.communityChest => Image.asset(city.imageName),
+          CellType.charity => Image.asset(city.imageName),
           CellType.chance => Image.asset(city.imageName),
-          CellType.railroad => Image.asset(city.imageName),
+          CellType.bikelane => Image.asset(city.imageName),
           CellType.utility => Image.asset(city.imageName),
           CellType.tax => Image.asset(city.imageName),
           CellType.jail => null,
@@ -612,8 +791,8 @@ Widget playerModel(Color playerColor) {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 3,
+            spreadRadius: 4,
+            blurRadius: 10,
           ),
         ],
       ),
