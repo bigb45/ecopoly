@@ -41,7 +41,9 @@ class _ContentWidgetState extends State<ContentWidget> {
   }
 
   void _rollDice() {
-    if (!_isRolling && !widget.gameManager.rolledDice) {
+    if (!_isRolling &&
+        !widget.gameManager.rolledDice &&
+        widget.gameManager.gameStarted) {
       setState(() {
         _isRolling = true;
       });
@@ -77,9 +79,13 @@ class _ContentWidgetState extends State<ContentWidget> {
               onTap: _rollDice,
               child:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Dice(value: _firstDieValue),
+                Dice(
+                    value: _firstDieValue,
+                    canRoll: !widget.gameManager.rolledDice),
                 const SizedBox(width: 20),
-                Dice(value: _secondDieValue),
+                Dice(
+                    value: _secondDieValue,
+                    canRoll: !widget.gameManager.rolledDice),
               ]),
             ),
             const SizedBox(height: 20),

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:ui';
 
 import 'package:ecopoly/models/cell.dart';
@@ -6,21 +8,23 @@ import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 
-const cardWidth = 160.0;
-const cardHeight = 200.0;
 const flagSize = 60.0;
 
 class CellDetails extends StatelessWidget {
   final int cardIndex;
+  final int currentPlayerIndex;
   final VoidCallback onClose;
-
   const CellDetails(
-      {super.key, required this.cardIndex, required this.onClose});
+      {super.key,
+      required this.cardIndex,
+      required this.onClose,
+      required this.currentPlayerIndex});
 
   @override
   Widget build(BuildContext context) {
     Cell cell = board[cardIndex];
-
+    final cardWidth = MediaQuery.of(context).size.width * 0.3;
+    final cardHeight = MediaQuery.of(context).size.height * 0.5;
     return Container(
       width: cardWidth,
       height: cardHeight,
@@ -116,13 +120,95 @@ class CellDetails extends StatelessWidget {
             ),
           if (cell is Property &&
               (cell.type != CellType.bikelane && cell.type != CellType.utility))
-            propertyInfo(cell),
+            propertyInfo(cell, currentPlayerIndex: currentPlayerIndex),
           if (cell is Tax) taxInfo(cell),
-          if (cell.type == CellType.utility) utilityInfo(cell as Property)
+          if (cell.type == CellType.utility) utilityInfo(cell as Property),
+          if (cell.type == CellType.bikelane) bikelaneInfo(cell as Property)
         ],
       ),
     );
   }
+}
+
+Widget bikelaneInfo(Property cell) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            cell.name,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            cell.type.name.toUpperCase(),
+            style: const TextStyle(fontSize: 10, color: Colors.white),
+          ),
+          Row(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: (cell).owner?.color ?? Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 2.0, horizontal: 6.0),
+                    child: Text(
+                      cell.owner?.name ?? "Not owned",
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          bikeLaneRent(cell.rent)
+        ],
+      ),
+    ),
+  );
+}
+
+Widget bikeLaneRent(int rent) {
+  return Column(children: [
+    bikeRow(1, 25, 1),
+    bikeRow(2, 25, 2),
+    bikeRow(3, 25, 4),
+    bikeRow(4, 25, 8),
+  ]);
+}
+
+Widget bikeRow(int bikeLanes, int rent, double multiplier) {
+  return Row(
+    children: [
+      Text(
+        bikeLanes > 1
+            ? "With $bikeLanes Bike lanes"
+            : "With $bikeLanes Bike lane",
+        style: const TextStyle(
+          fontSize: 10,
+          color: Colors.white,
+        ),
+      ),
+      const Spacer(),
+      Text(
+        "\$${(rent * multiplier).round()}",
+        style: const TextStyle(fontSize: 10, color: Colors.white),
+      ),
+    ],
+  );
 }
 
 Widget utilityInfo(Property cell) {
@@ -225,7 +311,7 @@ Widget taxInfo(Tax cell) {
   );
 }
 
-Widget propertyInfo(Property cell) {
+Widget propertyInfo(Property cell, {required int currentPlayerIndex}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
     child: Center(
@@ -244,31 +330,121 @@ Widget propertyInfo(Property cell) {
             cell.type.name.toUpperCase(),
             style: const TextStyle(fontSize: 10, color: Colors.white),
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              decoration: BoxDecoration(
-                color: (cell).owner?.color ?? Colors.grey.shade900,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-                child: Text(
-                  cell.owner?.name ?? "Not owned",
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: (cell).owner?.color ?? Colors.grey.shade900,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 2.0, horizontal: 6.0),
+                    child: Text(
+                      cell.owner?.name ?? "Not owned",
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              if (cell.owner != null && cell.owner!.index == currentPlayerIndex)
+                ...propertyManagement(
+                  onBuild: () {
+                    print("Build");
+                  },
+                  onDestroy: () {
+                    print("Destroy");
+                  },
+                  onSell: () {
+                    print(
+                        "player index ${currentPlayerIndex} sold ${cell.name}");
+                  },
+                )
+            ],
           ),
           rent(basePrice: (cell).cost, rent: cell.rent, multiplier: 4),
         ],
       ),
     ),
   );
+}
+
+List<Widget> propertyManagement(
+    {required VoidCallback onBuild,
+    required VoidCallback onDestroy,
+    required VoidCallback onSell}) {
+  return [
+    GestureDetector(
+      onTap: onBuild,
+      child: Container(
+        height: 24,
+        width: 24,
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 6,
+              offset: Offset(0, 0),
+            ),
+          ],
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: const Icon(
+          Icons.arrow_upward,
+          color: Colors.white,
+          size: 16,
+        ),
+      ),
+    ),
+    GestureDetector(
+      onTap: onDestroy,
+      child: Container(
+        height: 24,
+        width: 24,
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 6,
+              offset: Offset(0, 0),
+            ),
+          ],
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: const Icon(Icons.arrow_downward, color: Colors.white, size: 16),
+      ),
+    ),
+    GestureDetector(
+      onTap: onSell,
+      child: Container(
+        height: 24,
+        width: 24,
+        decoration: BoxDecoration(
+          color: Colors.red,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 6,
+              offset: Offset(0, 0),
+            ),
+          ],
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: const Icon(Icons.sell, color: Colors.white, size: 16),
+      ),
+    ),
+  ];
 }
 
 Widget rent(
@@ -285,7 +461,7 @@ Widget rent(
     Row(
       children: [
         const Text(
-          "with FOREST",
+          "with Forest",
           style: TextStyle(fontSize: 10, color: Colors.white),
         ),
         const Spacer(),

@@ -66,22 +66,22 @@ class PlayersInformation extends StatelessWidget {
                           Text(player.name,
                               style: const TextStyle(
                                   fontSize: 12, color: Colors.white)),
-                          // AnimatedDigitWidget(
-                          //   textStyle: const TextStyle(
-                          //       fontSize: 12, color: Colors.green),
-                          //   prefix: "\$",
-                          //   value: player.money,
-                          //   duration: const Duration(milliseconds: 1000),
-                          //   valueColors: [
-                          //     ValueColor(
-                          //       condition: () => player.money <= 0,
-                          //       color: Colors.red,
-                          //     ),
-                          //   ],
-                          // ),
-                          Text("${player.money}",
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.white)),
+                          AnimatedDigitWidget(
+                            textStyle: const TextStyle(
+                                fontSize: 12, color: Colors.green),
+                            prefix: "\$",
+                            value: player.money,
+                            duration: const Duration(milliseconds: 1000),
+                            valueColors: [
+                              ValueColor(
+                                condition: () => player.money <= 0,
+                                color: Colors.red,
+                              ),
+                            ],
+                          ),
+                          // Text("${player.money}",
+                          //     style: const TextStyle(
+                          //         fontSize: 12, color: Colors.white)),
                         ],
                       ),
                     ),

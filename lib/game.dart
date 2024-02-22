@@ -83,7 +83,7 @@ class _GameScreenState extends State<GameScreen> {
         child: Row(
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 80.0, right: 20.0),
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
               child: Center(
                 child: FittedBox(
                   child: Stack(
@@ -230,59 +230,64 @@ class _GameScreenState extends State<GameScreen> {
                     );
                   },
                 ),
-                // Visibility(
-                //   visible: gameManager.gameStarted,
-                //   child: ElevatedButton(
-                //       onPressed: () => showDialog(
-                //             context: context,
-                //             builder: (BuildContext context) => Padding(
-                //               padding: const EdgeInsets.all(8.0),
-                //               child: AlertDialog(
-                //                 actionsAlignment: MainAxisAlignment.center,
-                //                 content:
-                //                     Text("Are you sure you want to Bankrupt?"),
-                //                 actions: [
-                //                   ElevatedButton(
-                //                     onPressed: () {
-                //                       setState(() {});
-                //                       Navigator.pop(context);
-                //                     },
-                //                     child: Text("Cancel"),
-                //                   ),
-                //                   ElevatedButton(
-                //                     onPressed: () {
-                //                       // TODO: replace the index with the actual player's index
-                //                       gameManager.quit(
-                //                           gameManager.currentPlayer.index);
-                //                       Navigator.pop(context);
-                //                       setState(() {});
-                //                     },
-                //                     child: Text(
-                //                       "Bankrupt",
-                //                       style: TextStyle(
-                //                           color: ColorScheme.fromSeed(
-                //                                   seedColor: Colors.deepPurple)
-                //                               .error),
-                //                     ),
-                //                   ),
-                //                 ],
-                //               ),
-                //             ),
-                //           ),
-                //       child: Text("Bankrupt"),),
-                // ),
-                // Visibility(
-                //   visible: infoCardOpen,
-                //   child: CellDetails(
-                //     cardIndex: infoCardIndex,
-                //     onClose: () {
-                //       setState(() {
-                //         infoCardOpen = false;
-                //         print("closed");
-                //       });
-                //     },
-                //   ),
-                // ),
+                Visibility(
+                  visible: gameManager.gameStarted,
+                  child: ElevatedButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (BuildContext context) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: AlertDialog(
+                          actionsAlignment: MainAxisAlignment.center,
+                          content: Text("Are you sure you want to Bankrupt?"),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {});
+                                Navigator.pop(context);
+                              },
+                              child: Text("Cancel"),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                // TODO: replace the index with the actual player's index
+                                gameManager
+                                    .quit(gameManager.currentPlayer.index);
+                                Navigator.pop(context);
+                                setState(() {});
+                              },
+                              child: Text(
+                                "Bankrupt",
+                                style: TextStyle(
+                                    color: ColorScheme.fromSeed(
+                                            seedColor: Colors.deepPurple)
+                                        .error),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    child: Text("Bankrupt"),
+                  ),
+                ),
+                AnimatedOpacity(
+                  opacity: infoCardOpen ? 1 : 0,
+                  duration: Duration(milliseconds: 400),
+                  child: Visibility(
+                    visible: infoCardOpen,
+                    child: CellDetails(
+                      cardIndex: infoCardIndex,
+                      currentPlayerIndex: gameManager.currentPlayer.index,
+                      onClose: () {
+                        setState(() {
+                          infoCardOpen = false;
+                          print("closed");
+                        });
+                      },
+                    ),
+                  ),
+                ),
               ],
             )
           ],
@@ -390,6 +395,18 @@ class _TradeDialogState extends State<TradeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      actions: [
+        ElevatedButton(
+          onPressed: null,
+          child: Text("Offer"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text("Cancel"),
+        ),
+      ],
       title: Text(
         "Trade Properties",
         textAlign: TextAlign.center,
@@ -408,17 +425,6 @@ class _TradeDialogState extends State<TradeDialog> {
                 PlayerPropertiesList(player: widget.currentPlayer),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(onPressed: null, child: Text("Offer")),
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("Cancel")),
-              ],
-            )
           ],
         ),
       ),
@@ -440,10 +446,11 @@ class PlayerPropertiesList extends StatefulWidget {
 
 class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
   Set<int> selectedIndexes = {};
-
+  int selectedMoney = 0;
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Center(
           child: Text(
@@ -453,6 +460,16 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
           ),
         ),
         SizedBox(height: 8),
+        Text("\$$selectedMoney"),
+        Slider(
+            value: selectedMoney.toDouble(),
+            onChanged: (value) {
+              setState(() {
+                selectedMoney = value.toInt();
+              });
+            },
+            max: widget.player.money.toDouble(),
+            min: 0),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(
