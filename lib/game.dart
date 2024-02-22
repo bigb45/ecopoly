@@ -1,17 +1,18 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, unused_local_variable, avoid_print
 
+import "dart:math";
+
+import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+
+import 'package:ecopoly/animations/animated_scale_fade.dart';
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/player.dart';
-import 'package:ecopoly/models/property.dart';
-import 'package:ecopoly/widgets/blurry_container.dart';
 import 'package:ecopoly/util/board.dart';
+import 'package:ecopoly/widgets/blurry_container.dart';
 import 'package:ecopoly/widgets/cell_details.dart';
-import 'package:ecopoly/animations/animated_scale_fade.dart';
-import 'package:ecopoly/widgets/dice.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
-import "dart:math";
+import 'package:ecopoly/widgets/content_widget.dart';
 
 import 'widgets/players_information.dart';
 
@@ -43,8 +44,6 @@ class _GameScreenState extends State<GameScreen> {
 
   void rollDice() {
     gameManager.rollDice();
-    double x = gameManager.currentPlayer.xPosition.toDouble();
-    double y = gameManager.currentPlayer.yPosition.toDouble();
     // widget.interactiveBoardController.value =
     //     Matrix4.diagonal3Values(1.5, 1.5, 1);
     // widget.interactiveBoardController.value =
@@ -107,7 +106,7 @@ class _GameScreenState extends State<GameScreen> {
                           columnGap: 0,
                           rowGap: 0,
                           children: [
-                            content(
+                            ContentWidget(
                               gameManager: gameManager,
                               rollDice: rollDice,
                               endTurn: endTurn,
@@ -225,128 +224,150 @@ class _GameScreenState extends State<GameScreen> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return AlertDialog(
-                          scrollable: true,
-                          title: Column(children: [
-                            Text('${player.name}\'s Properties'),
-                            Text("Money: \$${player.money}",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14)),
-                          ]),
-                          content: SingleChildScrollView(
-                            child: Container(
-                              width: MediaQuery.of(context).size.width *
-                                  0.4, // Adjust the width as needed
-                              padding: EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: player.properties.map((property) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Row(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(40),
-                                          child: Image.asset(
-                                            property.imageName,
-                                            width: 30,
-                                            height: 30,
-                                          ),
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          property.name,
-                                          style: TextStyle(color: Colors.black),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                          actions: [
-                            if (player.index != gameManager.currentPlayer.index)
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => TradeDialog(
-                                        targetPlayer: player,
-                                        currentPlayer:
-                                            gameManager.currentPlayer),
-                                  );
-                                },
-                                child: Text("Offer Trade"),
-                              ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Close'),
-                            ),
-                          ],
-                        );
+                        return PlayerPropertiesDialog(
+                            gameManager: gameManager, player: player);
                       },
                     );
                   },
                 ),
-                if (gameManager.gameStarted)
-                  ElevatedButton(
-                      onPressed: () => showDialog(
-                            context: context,
-                            builder: (BuildContext context) => Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: AlertDialog(
-                                actionsAlignment: MainAxisAlignment.center,
-                                content:
-                                    Text("Are you sure you want to Bankrupt?"),
-                                actions: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      setState(() {});
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text("Cancel"),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // TODO: replace the index with the actual player's index
-                                      gameManager.quit(
-                                          gameManager.currentPlayer.index);
-                                      Navigator.pop(context);
-                                      setState(() {});
-                                    },
-                                    child: Text(
-                                      "Bankrupt",
-                                      style: TextStyle(
-                                          color: ColorScheme.fromSeed(
-                                                  seedColor: Colors.deepPurple)
-                                              .error),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                      child: Text("Bankrupt")),
-                if (infoCardOpen)
-                  CellDetails(
-                    cardIndex: infoCardIndex,
-                    onClose: () {
-                      setState(() {
-                        infoCardOpen = false;
-                        print("closed");
-                      });
-                    },
-                  ),
+                // Visibility(
+                //   visible: gameManager.gameStarted,
+                //   child: ElevatedButton(
+                //       onPressed: () => showDialog(
+                //             context: context,
+                //             builder: (BuildContext context) => Padding(
+                //               padding: const EdgeInsets.all(8.0),
+                //               child: AlertDialog(
+                //                 actionsAlignment: MainAxisAlignment.center,
+                //                 content:
+                //                     Text("Are you sure you want to Bankrupt?"),
+                //                 actions: [
+                //                   ElevatedButton(
+                //                     onPressed: () {
+                //                       setState(() {});
+                //                       Navigator.pop(context);
+                //                     },
+                //                     child: Text("Cancel"),
+                //                   ),
+                //                   ElevatedButton(
+                //                     onPressed: () {
+                //                       // TODO: replace the index with the actual player's index
+                //                       gameManager.quit(
+                //                           gameManager.currentPlayer.index);
+                //                       Navigator.pop(context);
+                //                       setState(() {});
+                //                     },
+                //                     child: Text(
+                //                       "Bankrupt",
+                //                       style: TextStyle(
+                //                           color: ColorScheme.fromSeed(
+                //                                   seedColor: Colors.deepPurple)
+                //                               .error),
+                //                     ),
+                //                   ),
+                //                 ],
+                //               ),
+                //             ),
+                //           ),
+                //       child: Text("Bankrupt"),),
+                // ),
+                // Visibility(
+                //   visible: infoCardOpen,
+                //   child: CellDetails(
+                //     cardIndex: infoCardIndex,
+                //     onClose: () {
+                //       setState(() {
+                //         infoCardOpen = false;
+                //         print("closed");
+                //       });
+                //     },
+                //   ),
+                // ),
               ],
             )
           ],
         ),
       ),
+    );
+  }
+}
+
+class PlayerPropertiesDialog extends StatelessWidget {
+  final Player player;
+  final GameManager gameManager;
+
+  const PlayerPropertiesDialog({
+    Key? key,
+    required this.player,
+    required this.gameManager,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      scrollable: true,
+      title: Column(
+        children: [
+          Text('${player.name}\'s Properties'),
+          Text(
+            "Money: \$${player.money}",
+            style: TextStyle(color: Colors.black, fontSize: 14),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.4,
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: player.properties.map((property) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(40),
+                      child: Image.asset(
+                        property.imageName,
+                        width: 30,
+                        height: 30,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      property.name,
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+      actions: [
+        if (player.index != gameManager.currentPlayer.index)
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) => TradeDialog(
+                  targetPlayer: player,
+                  currentPlayer: gameManager.currentPlayer,
+                ),
+              );
+            },
+            child: Text("Offer Trade"),
+          ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Close'),
+        ),
+      ],
     );
   }
 }
@@ -375,18 +396,29 @@ class _TradeDialogState extends State<TradeDialog> {
       ),
       content: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
           children: [
-            Container(
-                color: Colors.red,
-                child: PlayerPropertiesList(player: widget.targetPlayer)),
-            SizedBox(
-              width: 10,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                PlayerPropertiesList(player: widget.targetPlayer),
+                SizedBox(
+                  width: 10,
+                ),
+                PlayerPropertiesList(player: widget.currentPlayer),
+              ],
             ),
-            Container(
-                color: Colors.blue,
-                child: PlayerPropertiesList(player: widget.currentPlayer)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(onPressed: null, child: Text("Offer")),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancel")),
+              ],
+            )
           ],
         ),
       ),
@@ -412,7 +444,6 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Center(
           child: Text(
@@ -447,7 +478,7 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
                         isSelected ? Colors.purpleAccent : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Colors.grey,
+                      color: isSelected ? Colors.purpleAccent : Colors.grey,
                       width: 1,
                     ),
                   ),
@@ -478,91 +509,6 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
       ],
     );
   }
-}
-
-Widget content({
-  required GameManager gameManager,
-  required VoidCallback rollDice,
-  required VoidCallback endTurn,
-  required VoidCallback buyProperty,
-  required VoidCallback startGame,
-}) {
-  return Container(
-    color: Color(int.parse("0xFF130F2D")),
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Dice(value: 2),
-            SizedBox(width: 20),
-            Dice(value: 2),
-          ]),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (!gameManager.gameStarted)
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                  ),
-                  onPressed: () {
-                    startGame();
-                  },
-                  child: Text("Start game"),
-                ),
-              if (gameManager.gameStarted && !gameManager.rolledDice)
-                AnimatedOpacity(
-                  duration: Duration(milliseconds: 300),
-                  opacity: gameManager.rolledDice ? 0 : 1,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.white),
-                    ),
-                    onPressed: !gameManager.rolledDice
-                        ? () {
-                            rollDice();
-                          }
-                        : null,
-                    child: Text("Roll dice"),
-                  ),
-                ),
-              if (gameManager.rolledDice)
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                  ),
-                  onPressed: gameManager.currentPlayer.money >= 0
-                      ? () {
-                          endTurn();
-                        }
-                      : null,
-                  child: Text("End turn"),
-                ),
-              if (gameManager.canBuyProperty)
-                SizedBox(
-                  width: 20,
-                ),
-              if (gameManager.canBuyProperty)
-                ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.white),
-                    ),
-                    onPressed: gameManager.currentPlayer.money >=
-                            (board[gameManager.currentPlayer.position]
-                                    as Property)
-                                .cost
-                        ? () {
-                            buyProperty();
-                          }
-                        : null,
-                    child: Text("Buy Property"))
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 (int, int) getPosition(int index) {
@@ -706,22 +652,6 @@ class BoardColumn extends StatelessWidget {
                         height: height,
                         centerChild: centerChild,
                       ),
-                      // uncomment this to show the country flag on the cell
-                      // if (city.type == CellType.utility)
-                      //   Positioned(
-                      //     top: -10,
-                      //     left: 10,
-                      //     child: SizedBox(
-                      //       width: 24,
-                      //       height: 24,
-                      //       child: ClipRRect(
-                      //         borderRadius: BorderRadius.circular(20),
-                      //         child: Image(
-                      //           image: AssetImage(city.imageName),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   )
                     ],
                   ),
                 ),
