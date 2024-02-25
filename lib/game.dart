@@ -68,6 +68,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void onCityClick(int index) {
     print("open card ${board[index].name}");
+    print("${gameManager.currentPlayer.yPosition}");
 
     setState(() {
       infoCardOpen = true;
@@ -144,38 +145,64 @@ class _GameScreenState extends State<GameScreen> {
                         (player) {
                           double playerDirection =
                               getDirection(player.position);
+                          double top = 0;
+                          double left = 0;
+                          int position = player.position ~/ 10;
+
+                          if (position % 2 == 0) {
+                            bool topOrBottom = position == 2;
+
+                            left = width +
+                                height *
+                                    ((topOrBottom
+                                            ? 10 - player.position % 10
+                                            : player.position % 10) -
+                                        1) +
+                                (height - playerSize) / 2;
+                            top = width / 2 +
+                                (topOrBottom
+                                    ? height * 10 + playerSize / 2
+                                    : -playerSize / 2);
+                          } else {
+                            bool leftOrRight = position == 3;
+
+                            top = width +
+                                height *
+                                    ((leftOrRight
+                                            ? 10 - player.position % 10
+                                            : player.position % 10) -
+                                        1) +
+                                (height - playerSize) / 2;
+                            left = (leftOrRight
+                                ? (width - playerSize) / 2
+                                : height * 10 + (width + playerSize) / 2);
+                          }
+                          // top = 0;
+                          // left = height + (width / 2) + height * 3;
                           return Builder(
                             builder: (context) {
                               if (player.index !=
                                   gameManager.currentPlayer.index) {
                                 int yOffset = switch (player.index) {
-                                  0 => -15,
-                                  1 => 15,
-                                  2 => -15,
-                                  3 => 15,
+                                  0 => -10,
+                                  1 => 10,
+                                  2 => -10,
+                                  3 => 10,
                                   int() => 0
                                 };
                                 int xOffset = switch (player.index) {
-                                  0 => -12,
-                                  1 => 12,
-                                  2 => 12,
-                                  3 => -12,
+                                  0 => -10,
+                                  1 => 10,
+                                  2 => 10,
+                                  3 => -10,
                                   int() => 0
                                 };
                                 int inJailOffset = player.isInJail ? 20 : 0;
                                 return AnimatedPositioned(
                                   duration: Duration(milliseconds: 600),
                                   curve: Curves.easeInOut,
-                                  top: ((height - playerSize) / 2) +
-                                      height * player.yPosition +
-                                      player.yPosition +
-                                      yOffset +
-                                      10,
-                                  left: (height - playerSize) / 2 +
-                                      height * player.xPosition +
-                                      player.xPosition +
-                                      xOffset +
-                                      10,
+                                  top: top + xOffset,
+                                  left: left + yOffset,
                                   child: Transform.rotate(
                                     angle: playerDirection,
                                     child: playerModel(player.color),
@@ -188,12 +215,8 @@ class _GameScreenState extends State<GameScreen> {
                                 return AnimatedPositioned(
                                   duration: Duration(milliseconds: 600),
                                   curve: Curves.easeInOutCubic,
-                                  top: ((width - playerSize) / 2) +
-                                      height * player.yPosition +
-                                      player.yPosition,
-                                  left: (width - playerSize) / 2 +
-                                      height * player.xPosition +
-                                      player.xPosition,
+                                  top: top,
+                                  left: left,
                                   child: AnimatedScaleFade(
                                     duration: Duration(milliseconds: 600),
                                     curve: Curves.easeInOut,
@@ -219,7 +242,8 @@ class _GameScreenState extends State<GameScreen> {
               children: [
                 PlayersInformation(
                   players: gameManager.players,
-                  currentPlayerIndex: gameManager.currentPlayer.index,
+                  currentPlayerIndex:
+                      gameManager.players.indexOf(gameManager.currentPlayer),
                   onPlayerClick: (player) {
                     showDialog(
                       context: context,
@@ -320,35 +344,33 @@ class PlayerPropertiesDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: SingleChildScrollView(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.4,
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: player.properties.map((property) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(40),
-                      child: Image.asset(
-                        property.imageName,
-                        width: 30,
-                        height: 30,
-                      ),
+      content: Container(
+        width: MediaQuery.of(context).size.width * 0.4,
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: player.properties.map((property) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(40),
+                    child: Image.asset(
+                      property.imageName,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      property.name,
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    property.name,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ),
       actions: [
@@ -395,6 +417,11 @@ class _TradeDialogState extends State<TradeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      icon: Icon(
+        Icons.swap_horiz,
+        size: 36,
+      ),
+      scrollable: true,
       actions: [
         ElevatedButton(
           onPressed: null,
@@ -411,22 +438,19 @@ class _TradeDialogState extends State<TradeDialog> {
         "Trade Properties",
         textAlign: TextAlign.center,
       ),
-      content: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PlayerPropertiesList(player: widget.targetPlayer),
-                SizedBox(
-                  width: 10,
-                ),
-                PlayerPropertiesList(player: widget.currentPlayer),
-              ],
-            ),
-          ],
-        ),
+      content: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PlayerPropertiesList(player: widget.targetPlayer),
+              SizedBox(
+                width: 10,
+              ),
+              PlayerPropertiesList(player: widget.currentPlayer),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -450,11 +474,11 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Center(
           child: Text(
-            widget.player.name,
+            "${widget.player.name}'s properties",
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
