@@ -41,6 +41,7 @@ dependencies:
   scidart: 0.0.2-dev.12
   firebase_messaging: ^13.0.4
   animated_digit: ^3.2.3
+  provider: ^6.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

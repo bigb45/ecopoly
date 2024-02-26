@@ -6,9 +6,9 @@ import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/dice.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ContentWidget extends StatefulWidget {
-  final GameManager gameManager;
   final VoidCallback rollDice;
   final VoidCallback endTurn;
   final VoidCallback buyProperty;
@@ -16,7 +16,6 @@ class ContentWidget extends StatefulWidget {
 
   const ContentWidget({
     Key? key,
-    required this.gameManager,
     required this.rollDice,
     required this.endTurn,
     required this.buyProperty,
@@ -41,9 +40,9 @@ class _ContentWidgetState extends State<ContentWidget> {
   }
 
   void _rollDice() {
-    if (!_isRolling &&
-        !widget.gameManager.rolledDice &&
-        widget.gameManager.gameStarted) {
+    final gameManager = Provider.of<GameManager>(context, listen: false);
+
+    if (!_isRolling && !gameManager.rolledDice && gameManager.gameStarted) {
       setState(() {
         _isRolling = true;
       });
@@ -58,8 +57,8 @@ class _ContentWidgetState extends State<ContentWidget> {
       Timer(const Duration(seconds: 1), () {
         setState(() {
           widget.rollDice();
-          _firstDieValue = widget.gameManager.firstDie;
-          _secondDieValue = widget.gameManager.secondDie;
+          _firstDieValue = gameManager.firstDie;
+          _secondDieValue = gameManager.secondDie;
           _timer.cancel();
           _isRolling = false;
         });
@@ -69,6 +68,8 @@ class _ContentWidgetState extends State<ContentWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final gameManager = Provider.of<GameManager>(context, listen: false);
+
     return Container(
       color: Color(int.parse("0xFF130F2D")),
       child: Center(
@@ -79,20 +80,16 @@ class _ContentWidgetState extends State<ContentWidget> {
               onTap: _rollDice,
               child:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Dice(
-                    value: _firstDieValue,
-                    canRoll: !widget.gameManager.rolledDice),
+                Dice(value: _firstDieValue, canRoll: !gameManager.rolledDice),
                 const SizedBox(width: 20),
-                Dice(
-                    value: _secondDieValue,
-                    canRoll: !widget.gameManager.rolledDice),
+                Dice(value: _secondDieValue, canRoll: !gameManager.rolledDice),
               ]),
             ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (!widget.gameManager.gameStarted)
+                if (!gameManager.gameStarted)
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.white),
@@ -102,17 +99,16 @@ class _ContentWidgetState extends State<ContentWidget> {
                     },
                     child: const Text("Start game"),
                   ),
-                if (widget.gameManager.gameStarted &&
-                    !widget.gameManager.rolledDice)
+                if (gameManager.gameStarted && !gameManager.rolledDice)
                   AnimatedOpacity(
                     duration: const Duration(milliseconds: 300),
-                    opacity: widget.gameManager.rolledDice ? 0 : 1,
+                    opacity: gameManager.rolledDice ? 0 : 1,
                     child: ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all(Colors.white),
                       ),
-                      onPressed: !widget.gameManager.rolledDice
+                      onPressed: !gameManager.rolledDice
                           ? () {
                               _rollDice();
                             }
@@ -120,30 +116,30 @@ class _ContentWidgetState extends State<ContentWidget> {
                       child: const Text("Roll dice"),
                     ),
                   ),
-                if (widget.gameManager.rolledDice)
+                if (gameManager.rolledDice)
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                     ),
-                    onPressed: widget.gameManager.currentPlayer.money >= 0
+                    onPressed: gameManager.currentPlayer.money >= 0
                         ? () {
                             widget.endTurn();
                           }
                         : null,
                     child: const Text("End turn"),
                   ),
-                if (widget.gameManager.canBuyProperty)
+                if (gameManager.canBuyProperty)
                   const SizedBox(
                     width: 20,
                   ),
-                if (widget.gameManager.canBuyProperty)
+                if (gameManager.canBuyProperty)
                   ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all(Colors.white),
                       ),
-                      onPressed: widget.gameManager.currentPlayer.money >=
-                              (board[widget.gameManager.currentPlayer.position]
+                      onPressed: gameManager.currentPlayer.money >=
+                              (board[gameManager.currentPlayer.position]
                                       as Property)
                                   .cost
                           ? () {

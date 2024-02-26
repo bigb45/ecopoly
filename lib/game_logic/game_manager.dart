@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 const gridWidth = 11;
 
-class GameManager {
+class GameManager extends ChangeNotifier {
   static final _instance = GameManager._init();
   static const jailPosition = 10;
   static const doublesLimit = 3;

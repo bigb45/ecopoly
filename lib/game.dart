@@ -1,19 +1,19 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, unused_local_variable, avoid_print
 
-import "dart:math";
-
+import 'package:ecopoly/util/player_position.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 
 import 'package:ecopoly/animations/animated_scale_fade.dart';
 import 'package:ecopoly/game_logic/game_manager.dart';
-import 'package:ecopoly/models/cell.dart';
-import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/blurry_container.dart';
 import 'package:ecopoly/widgets/cell_details.dart';
-import 'package:ecopoly/widgets/content_widget.dart';
+import 'package:provider/provider.dart';
 
+import 'board_cells.dart';
+import 'widgets/player_model.dart';
+import 'widgets/player_properties_dialog.dart';
 import 'widgets/players_information.dart';
 
 const double width = 80;
@@ -23,6 +23,7 @@ const gridWidth = 11;
 
 class GameScreen extends StatefulWidget {
   final TransformationController interactiveBoardController;
+
   const GameScreen({
     super.key,
     required this.interactiveBoardController,
@@ -33,43 +34,34 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  GameManager gameManager = GameManager();
   bool infoCardOpen = false;
   int infoCardIndex = 0;
-  @override
-  void initState() {
-    super.initState();
-    gameManager.setPlayers(4);
-  }
 
-  void rollDice() {
-    gameManager.rollDice();
-    // widget.interactiveBoardController.value =
-    //     Matrix4.diagonal3Values(1.5, 1.5, 1);
-    // widget.interactiveBoardController.value =
-    //     widget.interactiveBoardController.value..translate(x * -10, y * -20, 0);
-    setState(() {});
-  }
+  // void rollDice() {
+  //   gameManager.rollDice();
+  //   // widget.interactiveBoardController.value =
+  //   //     Matrix4.diagonal3Values(1.5, 1.5, 1);
+  //   // widget.interactiveBoardController.value =
+  //   //     widget.interactiveBoardController.value..translate(x * -10, y * -20, 0);
+  //   setState(() {});
+  // }
 
-  void endTurn() {
-    gameManager.endTurn();
-    setState(() {});
-  }
+  // void endTurn() {
+  //   gameManager.endTurn();
+  //   setState(() {});
+  // }
 
-  void buyProperty() {
-    gameManager.buyProperty();
-    setState(() {});
-  }
+  // void buyProperty() {
+  //   gameManager.buyProperty();
+  //   setState(() {});
+  // }
 
-  void startGame() {
-    gameManager.startGame();
-    setState(() {});
-  }
+  // void startGame() {
+  //   gameManager.startGame();
+  //   setState(() {});
+  // }
 
   void onCityClick(int index) {
-    print("open card ${board[index].name}");
-    print("${gameManager.currentPlayer.yPosition}");
-
     setState(() {
       infoCardOpen = true;
       infoCardIndex = index;
@@ -78,6 +70,7 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final gameManager = Provider.of<GameManager>(context);
     return Scaffold(
       body: Container(
         color: Color(int.parse("0xFF130F3D")),
@@ -107,14 +100,13 @@ class _GameScreenState extends State<GameScreen> {
                           columnGap: 0,
                           rowGap: 0,
                           children: [
-                            ContentWidget(
-                              gameManager: gameManager,
-                              rollDice: rollDice,
-                              endTurn: endTurn,
-                              buyProperty: buyProperty,
-                              startGame: startGame,
-                            ).inGridArea("content"),
-                            jail(gameManager: gameManager).inGridArea('go'),
+                            // ContentWidget(
+                            //   rollDice: rollDice,
+                            //   endTurn: endTurn,
+                            //   buyProperty: buyProperty,
+                            //   startGame: startGame,
+                            // ).inGridArea("content"),
+                            start().inGridArea('go'),
                             BoardRow(
                                 index: 0,
                                 cities: board.sublist(1, 10),
@@ -177,8 +169,7 @@ class _GameScreenState extends State<GameScreen> {
                                 ? (width - playerSize) / 2
                                 : height * 10 + (width + playerSize) / 2);
                           }
-                          // top = 0;
-                          // left = height + (width / 2) + height * 3;
+
                           return Builder(
                             builder: (context) {
                               if (player.index !=
@@ -321,247 +312,21 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-class PlayerPropertiesDialog extends StatelessWidget {
-  final Player player;
-  final GameManager gameManager;
-
-  const PlayerPropertiesDialog({
-    Key? key,
-    required this.player,
-    required this.gameManager,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      scrollable: true,
-      title: Column(
-        children: [
-          Text('${player.name}\'s Properties'),
-          Text(
-            "Money: \$${player.money}",
-            style: TextStyle(color: Colors.black, fontSize: 14),
-          ),
-        ],
+Widget start() {
+  return BlurryContainer(
+    width: width,
+    height: width,
+    blurStrength: 0,
+    cell: board[0],
+    child: Text(
+      'Start',
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.white,
       ),
-      content: Container(
-        width: MediaQuery.of(context).size.width * 0.4,
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: player.properties.map((property) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: Image.asset(
-                      property.imageName,
-                      width: 30,
-                      height: 30,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    property.name,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-      actions: [
-        if (player.index != gameManager.currentPlayer.index)
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              showDialog(
-                context: context,
-                builder: (context) => TradeDialog(
-                  targetPlayer: player,
-                  currentPlayer: gameManager.currentPlayer,
-                ),
-              );
-            },
-            child: Text("Offer Trade"),
-          ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Close'),
-        ),
-      ],
-    );
-  }
-}
-
-class TradeDialog extends StatefulWidget {
-  final Player currentPlayer;
-  final Player targetPlayer;
-
-  const TradeDialog({
-    Key? key,
-    required this.currentPlayer,
-    required this.targetPlayer,
-  }) : super(key: key);
-
-  @override
-  State<TradeDialog> createState() => _TradeDialogState();
-}
-
-class _TradeDialogState extends State<TradeDialog> {
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      icon: Icon(
-        Icons.swap_horiz,
-        size: 36,
-      ),
-      scrollable: true,
-      actions: [
-        ElevatedButton(
-          onPressed: null,
-          child: Text("Offer"),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text("Cancel"),
-        ),
-      ],
-      title: Text(
-        "Trade Properties",
-        textAlign: TextAlign.center,
-      ),
-      content: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              PlayerPropertiesList(player: widget.targetPlayer),
-              SizedBox(
-                width: 10,
-              ),
-              PlayerPropertiesList(player: widget.currentPlayer),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class PlayerPropertiesList extends StatefulWidget {
-  final Player player;
-
-  const PlayerPropertiesList({
-    Key? key,
-    required this.player,
-  }) : super(key: key);
-
-  @override
-  State<PlayerPropertiesList> createState() => _PlayerPropertiesListState();
-}
-
-class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
-  Set<int> selectedIndexes = {};
-  int selectedMoney = 0;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Center(
-          child: Text(
-            "${widget.player.name}'s properties",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        SizedBox(height: 8),
-        Text("\$$selectedMoney"),
-        Slider(
-            value: selectedMoney.toDouble(),
-            onChanged: (value) {
-              setState(() {
-                selectedMoney = value.toInt();
-              });
-            },
-            max: widget.player.money.toDouble(),
-            min: 0),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(
-            widget.player.properties.length,
-            (index) {
-              final property = widget.player.properties[index];
-              final isSelected = selectedIndexes.contains(index);
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isSelected) {
-                      selectedIndexes.remove(index);
-                    } else {
-                      selectedIndexes.add(index);
-                    }
-                  });
-                },
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  margin: EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                    color:
-                        isSelected ? Colors.purpleAccent : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected ? Colors.purpleAccent : Colors.grey,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
-                        child: Image.asset(
-                          property.imageName,
-                          width: 15,
-                          height: 15,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        property.name,
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-(int, int) getPosition(int index) {
-  if (index < 10) {
-    return (10, index);
-  } else if (index < 20) {
-    return (10 - index, 10);
-  } else if (index < 30) {
-    return (0, 10 - (index - 20));
-  } else {
-    return (index - 30, 0);
-  }
+      textAlign: TextAlign.center,
+    ),
+  );
 }
 
 Widget jail({GameManager? gameManager}) {
@@ -578,224 +343,5 @@ Widget jail({GameManager? gameManager}) {
       ),
       textAlign: TextAlign.center,
     ),
-  );
-}
-
-class BoardRow extends StatelessWidget {
-  final int index;
-  final List<Cell> cities;
-  final Function(int index) onCityClick;
-
-  const BoardRow(
-      {super.key,
-      required this.index,
-      required this.cities,
-      required this.onCityClick});
-
-  @override
-  Widget build(BuildContext context) {
-    bool reverseOrder = index == 2;
-
-    return Row(
-      textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
-      children: cities.map(
-        (city) {
-          int cellIndex = cities.indexOf(city) + (index * 10);
-          Widget? centerChild = switch (city.type) {
-            CellType.charity => Image.asset(city.imageName),
-            CellType.chance => Image.asset(city.imageName),
-            CellType.bikelane => Image.asset(city.imageName),
-            CellType.utility => Image.asset(city.imageName),
-            CellType.tax => Image.asset(city.imageName),
-            CellType.jail => null,
-            CellType.goToJail => null,
-            CellType.freeParking => null,
-            CellType.start => null,
-            CellType.property => null,
-          };
-          return GestureDetector(
-            onTap: () {
-              onCityClick(cellIndex + 1);
-            },
-            child: Container(
-              child: Stack(
-                children: [
-                  _buildSquare(
-                    cell: city,
-                    width: height,
-                    height: width,
-                    centerChild: centerChild,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ).toList(),
-    );
-  }
-}
-
-class BoardColumn extends StatelessWidget {
-  final int index;
-  final List<Cell> cities;
-  final Function(int index) onCityClick;
-
-  const BoardColumn(
-      {super.key,
-      required this.index,
-      required this.cities,
-      required this.onCityClick});
-
-  @override
-  Widget build(BuildContext context) {
-    bool reverseOrder = index == 3;
-    double angle = 0;
-    if (index == 1) {
-      angle = -pi / 2;
-    } else if (index == 3) {
-      angle = pi / 2;
-    }
-    return Column(
-      key: ValueKey(index),
-      verticalDirection:
-          reverseOrder ? VerticalDirection.up : VerticalDirection.down,
-      textDirection: reverseOrder ? TextDirection.rtl : TextDirection.ltr,
-      children: cities.map((city) {
-        int cellIndex = cities.indexOf(city) + (index * 10);
-        Widget? centerChild = switch (city.type) {
-          CellType.charity => Image.asset(city.imageName),
-          CellType.chance => Image.asset(city.imageName),
-          CellType.bikelane => Image.asset(city.imageName),
-          CellType.utility => Image.asset(city.imageName),
-          CellType.tax => Image.asset(city.imageName),
-          CellType.jail => null,
-          CellType.goToJail => null,
-          CellType.freeParking => null,
-          CellType.start => null,
-          CellType.property => null,
-        };
-        return GestureDetector(
-          onTap: () {
-            onCityClick(cellIndex + 1);
-          },
-          child: Transform.rotate(
-            angle: 0,
-            child: Stack(
-              children: [
-                Container(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      _buildSquare(
-                        cell: city,
-                        width: width,
-                        height: height,
-                        centerChild: centerChild,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-Widget _buildSquare(
-    {double width = 80,
-    double height = 50,
-    required Cell cell,
-    Widget? centerChild}) {
-  return Stack(
-    alignment: Alignment.bottomCenter,
-    children: [
-      BlurryContainer(
-        width: width,
-        height: height,
-        blurStrength: 0.2,
-        cell: cell,
-        centerChild: centerChild,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 4.0),
-          child: Text(
-            cell.name,
-            style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                height: 1),
-            textAlign: TextAlign.center,
-            softWrap: true,
-            overflow: TextOverflow.fade,
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-double getDirection(int position) {
-  if (position < 10) {
-    return pi;
-  } else if (position < 20) {
-    return -pi / 2;
-  } else if (position < 30) {
-    return 2 * pi;
-  } else {
-    return pi / 2;
-  }
-}
-
-Widget playerModel(Color playerColor) {
-  return Stack(children: [
-    Container(
-      alignment: Alignment.topCenter,
-      height: playerSize,
-      width: playerSize,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: playerColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            spreadRadius: 4,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-    ),
-    Positioned(top: 10, left: 3, child: playerEye()),
-    Positioned(top: 2, left: 3, child: playerEye()),
-  ]);
-}
-
-Widget playerEye() {
-  return Stack(
-    children: [
-      Container(
-        height: 6,
-        width: 6,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-        ),
-      ),
-      Positioned(
-        top: 1,
-        left: 0,
-        child: Container(
-          height: 3,
-          width: 3,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.black,
-          ),
-        ),
-      ),
-    ],
   );
 }

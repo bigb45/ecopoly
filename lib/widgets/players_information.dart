@@ -5,6 +5,8 @@ import 'package:ecopoly/game.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:flutter/material.dart';
 
+import 'player_model.dart';
+
 class PlayersInformation extends StatelessWidget {
   final List<Player> players;
   Function(Player player) onPlayerClick;
