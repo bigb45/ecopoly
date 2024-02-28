@@ -82,7 +82,7 @@ List<Cell> board = [
       imageName: "assets/images/jail.png",
       name: "Jail",
       index: 10,
-      type: CellType.goToJail),
+      type: CellType.jail),
 
   // Second row
   Property(
@@ -326,62 +326,62 @@ List<Cell> board = [
   ),
 ];
 
-List<Card> surpriseCards = const [
-  Card(
+List<GameCard> chanceCards = const [
+  GameCard(
     title: 'Ocean Cleanup Reward',
     description:
         'Receive \$200 as a reward for participating in an ocean cleanup initiative and contributing to marine life protection.',
     amount: 200,
   ),
-  Card(
+  GameCard(
     title: 'Community Garden Harvest',
     description:
         'Enjoy a bountiful harvest from your community garden project. Receive \$100 from selling fresh, locally grown produce.',
     amount: 100,
   ),
-  Card(
+  GameCard(
     title: 'Electric Vehicle Incentive',
     description:
         'Earn \$50 for each electric vehicle you own, as part of an incentive program to promote eco-friendly transportation.',
     amount: 50,
   ),
-  Card(
+  GameCard(
     title: 'Solar Energy Savings',
     description:
         'You saved money on energy bills with your solar panel installation. Enjoy \$50',
     amount: 50,
   ),
-  Card(
+  GameCard(
     title: 'National Park Contribution',
     description:
         'Receive \$150 from national park preservation efforts. Your contribution helps protect natural habitats and wildlife.',
     amount: 150,
   ),
-  Card(
+  GameCard(
     title: 'Recycling Initiative Payout',
     description:
         'Receive \$75 for consistently participating in recycling programs and reducing waste in your community.',
     amount: 75,
   ),
-  Card(
+  GameCard(
     title: 'Energy-Efficient Home Rebate',
     description:
         'Qualified for a \$250 rebate for upgrading to energy-efficient appliances and making your home more sustainable.',
     amount: 250,
   ),
-  Card(
+  GameCard(
     title: 'Clean Transportation Bonus',
     description:
         'Get rewarded with \$100 for regularly using public transportation and cycling to reduce carbon emissions.',
     amount: 100,
   ),
-  Card(
+  GameCard(
     title: 'Renewable Energy Dividends',
     description:
         'Earn \$50 in dividends for investing in renewable energy stocks and supporting the transition to clean energy sources.',
     amount: 50,
   ),
-  Card(
+  GameCard(
     title: 'Eco-Friendly Business Grant',
     description:
         'Receive a \$500 grant for implementing eco-friendly practices in your business operations and promoting sustainability.',
@@ -389,55 +389,55 @@ List<Card> surpriseCards = const [
   ),
 ];
 
-List<Card> chanceCards = const [
-  Card(
+List<GameCard> surpriseCards = const [
+  GameCard(
     title: "Windfall!",
     description: "You won a local eco-friendly contest. Collect \$200.",
     amount: 200,
   ),
-  Card(
+  GameCard(
     title: "Solar Panel Mishap",
     description: "Your solar panels need repairs. Pay \$100 for maintenance.",
     amount: -100,
   ),
-  Card(
+  GameCard(
     title: "Clean Energy Tax Credit",
     description: "Received a tax credit for using clean energy. Collect \$150.",
     amount: 150,
   ),
-  Card(
+  GameCard(
     title: "Carbon Tax",
     description: "Pay a carbon tax for excessive emissions. Pay \$50.",
     amount: -50,
   ),
-  Card(
+  GameCard(
     title: "Green Innovation Grant",
     description: "Received a grant for green innovation. Collect \$200.",
     amount: 300,
   ),
-  Card(
+  GameCard(
     title: "Eco-Friendly Transportation",
     description: "Invested \$75 in eco-friendly transportation. ",
     amount: -75,
   ),
-  Card(
+  GameCard(
     title: "Recycling Rebate",
     description: "Received a rebate for recycling efforts. Collect \$50.",
     amount: 50,
   ),
-  Card(
+  GameCard(
     title: "Drought Emergency",
     description:
         "Experience a drought emergency. Pay \$200 for water conservation efforts.",
     amount: -200,
   ),
-  Card(
+  GameCard(
     title: "Renewable Energy Investment",
     description:
         "Invested in renewable energy stocks. Earn \$100 in dividends.",
     amount: 100,
   ),
-  Card(
+  GameCard(
     title: "Green Tax Credit",
     description:
         "Received a tax credit for eco-friendly home upgrades. Collect \$250.",

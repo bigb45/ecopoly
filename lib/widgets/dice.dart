@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Dice extends StatefulWidget {
+  final Color playerColor;
   final int value;
   final bool canRoll;
-  const Dice({Key? key, required this.value, required this.canRoll})
+  const Dice(
+      {Key? key,
+      required this.value,
+      required this.canRoll,
+      required this.playerColor})
       : super(key: key);
 
   @override
@@ -18,7 +23,7 @@ class _DiceState extends State<Dice> {
         boxShadow: [
           BoxShadow(
             color: widget.canRoll
-                ? Colors.blueAccent
+                ? widget.playerColor
                 : Colors.black.withOpacity(0.5),
             blurRadius: 10,
             spreadRadius: 5,

@@ -101,28 +101,28 @@ class BlurryContainer extends StatelessWidget {
             //         cell.type == CellType.utility ||
             //         cell.type == CellType.railroad) &&
             //     (cell as Property).owner != null)
-            //   ClipRect(
-            //     clipper: const ClipPad(padding: EdgeInsets.only(top: 3)),
-            //     child: Container(
-            //       height: 12,
-            //       width: width,
-            //       decoration: BoxDecoration(
-            //         color: (cell as Property).owner!.color,
-            //         boxShadow: [
-            //           BoxShadow(
-            //             color: Colors.black.withOpacity(0.5),
-            //             spreadRadius: 1,
-            //             blurRadius: 5,
-            //             offset: const Offset(0, 0),
-            //           ),
-            //         ],
-            //         borderRadius: const BorderRadius.only(
-            //           topLeft: Radius.circular(2),
-            //           topRight: Radius.circular(2),
+            // ClipRect(
+            //   clipper: const ClipPad(padding: EdgeInsets.only(top: 3)),
+            //   child: Container(
+            //     height: 12,
+            //     width: width,
+            //     decoration: BoxDecoration(
+            //       color: (cell as Property).owner!.color,
+            //       boxShadow: [
+            //         BoxShadow(
+            //           color: Colors.black.withOpacity(0.5),
+            //           spreadRadius: 1,
+            //           blurRadius: 5,
+            //           offset: const Offset(0, 0),
             //         ),
+            //       ],
+            //       borderRadius: const BorderRadius.only(
+            //         topLeft: Radius.circular(2),
+            //         topRight: Radius.circular(2),
             //       ),
             //     ),
             //   ),
+            // ),
             SizedBox(height: height, width: width, child: child),
           ],
         ),

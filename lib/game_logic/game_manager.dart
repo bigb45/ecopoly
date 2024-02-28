@@ -3,12 +3,15 @@
 import 'dart:math';
 
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/game_event.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/player_status.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/util/board.dart';
+import 'package:ecopoly/util/trade.dart';
 import 'package:flutter/material.dart';
+import 'package:ecopoly/models/card.dart';
 
 const gridWidth = 11;
 
@@ -23,6 +26,7 @@ class GameManager extends ChangeNotifier {
   bool rolledDice = false;
   bool canBuyProperty = false;
   int doublesCount = 0;
+  List<GameEvent> gameEvents = [];
   var firstDie = 1;
   var secondDie = 1;
   List<Player> players = const [];
@@ -46,14 +50,25 @@ class GameManager extends ChangeNotifier {
   }
 
   void startGame() {
+    gameEvents.insert(
+        0,
+        GameEvent(
+            message: "",
+            firstPlayer: currentPlayer,
+            secondPlayer: null,
+            amount: null,
+            property: null,
+            type: EventType.gameStart));
     gameStarted = true;
     currentPlayer = players[0];
+    notifyListeners();
     print("Game started");
   }
 
   (int, int) rollDice() {
     firstDie = Random().nextInt(6) + 1;
     secondDie = Random().nextInt(6) + 1;
+
     // var firstDie = 4;
     // var secondDie = 2;
     int prevPosition = currentPlayer.position;
@@ -80,7 +95,7 @@ class GameManager extends ChangeNotifier {
     }
     CellType cellType = board[currentPlayer.position].type;
     _handleNewPlayerPosition(cellType, prevPosition);
-
+    notifyListeners();
     return (firstDie, secondDie);
   }
 
@@ -96,27 +111,44 @@ class GameManager extends ChangeNotifier {
     final isProperty = (cellType == CellType.property ||
         cellType == CellType.utility ||
         cellType == CellType.bikelane);
+
+    // if the player lands on property that is not owned
     if (isProperty &&
         (board[currentPlayer.position] as Property).owner == null) {
       canBuyProperty = true;
+      notifyListeners();
     } else {
       canBuyProperty = false;
+      notifyListeners();
     }
+
     // if the player passes go
     if (prevPosition > currentPlayer.position &&
         currentPlayer.position != 0 &&
         !currentPlayer.isInJail) {
       currentPlayer.money += 200;
       print("Player ${currentPlayer.name} passed go, received 200");
+      notifyListeners();
       return;
     }
 
     // if the player lands on tax
     if (cellType == CellType.tax) {
-      currentPlayer.money -= (board[currentPlayer.position] as Tax).amount ??
+      int tax = (board[currentPlayer.position] as Tax).amount ??
           ((board[currentPlayer.position] as Tax).percentage! *
                   currentPlayer.money)
               .round();
+      currentPlayer.money -= tax;
+      gameEvents.insert(
+          0,
+          GameEvent(
+              message: "",
+              firstPlayer: currentPlayer,
+              secondPlayer: null,
+              amount: tax,
+              property: null,
+              type: EventType.tax));
+      notifyListeners();
       return;
     }
 
@@ -130,7 +162,19 @@ class GameManager extends ChangeNotifier {
         owner.money += property.rent;
         print(
             "Player ${currentPlayer.name} landed on ${property.name}, paid ${property.rent} to ${owner.name}");
+        gameEvents.insert(
+            0,
+            GameEvent(
+                message:
+                    "Player ${currentPlayer.name} landed on ${property.name}, paid ${property.rent} to ${owner.name}",
+                firstPlayer: currentPlayer,
+                secondPlayer: owner,
+                property: property,
+                amount: property.rent,
+                type: EventType.rent));
       }
+
+      notifyListeners();
       return;
     }
 
@@ -138,15 +182,94 @@ class GameManager extends ChangeNotifier {
     if (cellType == CellType.goToJail) {
       sendToJail();
       print("Player ${currentPlayer.name} landed on go to jail");
+      gameEvents.insert(
+          0,
+          GameEvent(
+              message: "",
+              firstPlayer: currentPlayer,
+              secondPlayer: null,
+              amount: null,
+              property: null,
+              type: EventType.goToJail));
+      notifyListeners();
       return;
     }
 
     // if the player lands on go
     if (cellType == CellType.start) {
       currentPlayer.money += 300;
-      print("Player ${currentPlayer.name} landed ON go, received 300");
+      print("Player ${currentPlayer.name} landed on go, received 300");
+      gameEvents.insert(
+          0,
+          GameEvent(
+              message: "",
+              firstPlayer: currentPlayer,
+              secondPlayer: null,
+              amount: null,
+              property: null,
+              type: EventType.go));
+      notifyListeners();
       return;
     }
+
+    if (cellType == CellType.chance) {
+      GameCard card = drawSurpriseCard();
+      currentPlayer.money += card.amount;
+      gameEvents.insert(
+          0,
+          GameEvent(
+              message: card.description,
+              firstPlayer: currentPlayer,
+              secondPlayer: null,
+              property: null,
+              amount: card.amount,
+              type: EventType.surprise));
+      notifyListeners();
+      return;
+    }
+    if (cellType == CellType.charity) {
+      GameCard card = drawCharityCard();
+      currentPlayer.money += card.amount;
+      gameEvents.insert(
+          0,
+          GameEvent(
+              message: card.description,
+              firstPlayer: currentPlayer,
+              secondPlayer: null,
+              property: null,
+              amount: card.amount,
+              type: EventType.charity));
+      notifyListeners();
+      return;
+    }
+  }
+
+  GameCard drawCharityCard() {
+    int charityCardIndex = Random().nextInt(chanceCards.length);
+    print(
+        "Player ${currentPlayer.name} drew a chance card, ${chanceCards[charityCardIndex].description}");
+    return chanceCards[charityCardIndex];
+  }
+
+  GameCard drawSurpriseCard() {
+    int surpriseCardIndex = Random().nextInt(surpriseCards.length);
+    print(
+        "Player ${currentPlayer.name} drew a chance card, ${surpriseCards[surpriseCardIndex].description}");
+    return surpriseCards[surpriseCardIndex];
+  }
+
+  void addTrade({required Trade trade}) {
+    gameEvents.insert(
+        0,
+        GameEvent(
+            message: "",
+            firstPlayer: trade.tradingPlayer,
+            secondPlayer: trade.receivingPlayer,
+            amount: null,
+            property: null,
+            type: EventType.offerTrade));
+    print("added trade $trade");
+    notifyListeners();
   }
 
   void buyProperty() {
@@ -162,6 +285,16 @@ class GameManager extends ChangeNotifier {
         .cast<String>();
     print(
         "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}, ${currentPlayer.name} now has $properties");
+    gameEvents.insert(
+        0,
+        GameEvent(
+            message: "",
+            firstPlayer: currentPlayer,
+            secondPlayer: null,
+            amount: null,
+            property: board[currentPlayer.position] as Property,
+            type: EventType.purchase));
+    notifyListeners();
   }
 
   void endTurn() {
@@ -169,6 +302,7 @@ class GameManager extends ChangeNotifier {
     rolledDice = false;
     canBuyProperty = false;
     doublesCount = 0;
+    notifyListeners();
   }
 
   void quit(int playerIndex) {
@@ -188,7 +322,14 @@ class GameManager extends ChangeNotifier {
   }
 
   Player _nextPlayer() {
-    return players[(players.indexOf(currentPlayer) + 1) % players.length];
+    if (!gameEnded) {
+      Player nextPlayer =
+          players[(players.indexOf(currentPlayer) + 1) % players.length];
+      if (nextPlayer.status == PlayerStatus.bankrupt) {}
+
+      return nextPlayer;
+    }
+    return Player(name: "Ended", money: 0, index: -1, color: Colors.red);
   }
 
   void endGame() {
@@ -215,6 +356,7 @@ class GameManager extends ChangeNotifier {
     }
     currentPlayer.xPosition = xPosition;
     currentPlayer.yPosition = yPosition;
+    notifyListeners();
     return (xPosition, yPosition);
   }
 

@@ -1,24 +1,25 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:animated_digit/animated_digit.dart';
-import 'package:ecopoly/game.dart';
+import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'player_model.dart';
 
 class PlayersInformation extends StatelessWidget {
-  final List<Player> players;
-  Function(Player player) onPlayerClick;
-  int currentPlayerIndex = 0;
-  PlayersInformation({
-    super.key,
-    required this.players,
-    required this.currentPlayerIndex,
+  final Function(Player player) onPlayerClick;
+
+  const PlayersInformation({
+    Key? key,
     required this.onPlayerClick,
-  });
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final gameManager = Provider.of<GameManager>(context, listen: false);
+    final players = gameManager.players;
+
     const rowHeight = 35.0;
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -40,8 +41,9 @@ class PlayersInformation extends StatelessWidget {
         child: Stack(
           children: [
             AnimatedPositioned(
-              duration: Duration(milliseconds: 300),
-              top: rowHeight * currentPlayerIndex,
+              duration: const Duration(milliseconds: 300),
+              top: rowHeight *
+                  gameManager.players.indexOf(gameManager.currentPlayer),
               left: 1,
               right: 1,
               child: Container(
@@ -81,9 +83,6 @@ class PlayersInformation extends StatelessWidget {
                               ),
                             ],
                           ),
-                          // Text("${player.money}",
-                          //     style: const TextStyle(
-                          //         fontSize: 12, color: Colors.white)),
                         ],
                       ),
                     ),

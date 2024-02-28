@@ -1,6 +1,9 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, unused_local_variable, avoid_print
 
+import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/util/player_position.dart';
+import 'package:ecopoly/widgets/content_widget.dart';
+import 'package:ecopoly/widgets/trade_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 
@@ -36,30 +39,6 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   bool infoCardOpen = false;
   int infoCardIndex = 0;
-
-  // void rollDice() {
-  //   gameManager.rollDice();
-  //   // widget.interactiveBoardController.value =
-  //   //     Matrix4.diagonal3Values(1.5, 1.5, 1);
-  //   // widget.interactiveBoardController.value =
-  //   //     widget.interactiveBoardController.value..translate(x * -10, y * -20, 0);
-  //   setState(() {});
-  // }
-
-  // void endTurn() {
-  //   gameManager.endTurn();
-  //   setState(() {});
-  // }
-
-  // void buyProperty() {
-  //   gameManager.buyProperty();
-  //   setState(() {});
-  // }
-
-  // void startGame() {
-  //   gameManager.startGame();
-  //   setState(() {});
-  // }
 
   void onCityClick(int index) {
     setState(() {
@@ -100,12 +79,7 @@ class _GameScreenState extends State<GameScreen> {
                           columnGap: 0,
                           rowGap: 0,
                           children: [
-                            // ContentWidget(
-                            //   rollDice: rollDice,
-                            //   endTurn: endTurn,
-                            //   buyProperty: buyProperty,
-                            //   startGame: startGame,
-                            // ).inGridArea("content"),
+                            ContentWidget().inGridArea('content'),
                             start().inGridArea('go'),
                             BoardRow(
                                 index: 0,
@@ -199,10 +173,7 @@ class _GameScreenState extends State<GameScreen> {
                                     child: playerModel(player.color),
                                   ),
                                 );
-                              }
-                              // return SizedBox();
-                              else {
-                                // TODO: place this outside the list in order to place the current player on top of others
+                              } else {
                                 return AnimatedPositioned(
                                   duration: Duration(milliseconds: 600),
                                   curve: Curves.easeInOutCubic,
@@ -232,59 +203,16 @@ class _GameScreenState extends State<GameScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 PlayersInformation(
-                  players: gameManager.players,
-                  currentPlayerIndex:
-                      gameManager.players.indexOf(gameManager.currentPlayer),
                   onPlayerClick: (player) {
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return PlayerPropertiesDialog(
-                            gameManager: gameManager, player: player);
-                      },
+                      builder: (con) => PlayerPropertiesDialog(
+                        outerContext: context,
+                        playerIndex: player.index,
+                        gameManager: gameManager,
+                      ),
                     );
                   },
-                ),
-                Visibility(
-                  visible: gameManager.gameStarted,
-                  child: ElevatedButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (BuildContext context) => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: AlertDialog(
-                          actionsAlignment: MainAxisAlignment.center,
-                          content: Text("Are you sure you want to Bankrupt?"),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {});
-                                Navigator.pop(context);
-                              },
-                              child: Text("Cancel"),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                // TODO: replace the index with the actual player's index
-                                gameManager
-                                    .quit(gameManager.currentPlayer.index);
-                                Navigator.pop(context);
-                                setState(() {});
-                              },
-                              child: Text(
-                                "Bankrupt",
-                                style: TextStyle(
-                                    color: ColorScheme.fromSeed(
-                                            seedColor: Colors.deepPurple)
-                                        .error),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    child: Text("Bankrupt"),
-                  ),
                 ),
                 AnimatedOpacity(
                   opacity: infoCardOpen ? 1 : 0,
@@ -310,6 +238,101 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
+}
+
+dialogTest(BuildContext context, int playerIndex) {
+  final GameManager gameManager =
+      Provider.of<GameManager>(context, listen: false);
+  Player player = gameManager.players.firstWhere((p) => p.index == playerIndex);
+  return showDialog(
+    context: context,
+    builder: (_) => ChangeNotifierProvider.value(
+      value: gameManager,
+      child: AlertDialog(
+        title: Column(
+          children: [
+            Text('${player.name}\'s Properties'),
+            Text(
+              "Money: \$${player.money}",
+              style: const TextStyle(color: Colors.black, fontSize: 14),
+            ),
+          ],
+        ),
+        content: Builder(builder: (context) {
+          if (player.properties.isEmpty) {
+            return const Center(
+              child: Text(
+                "No properties owned",
+                style: TextStyle(color: Colors.black),
+              ),
+            );
+          }
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+            ),
+            width: MediaQuery.of(context).size.width * 0.4,
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: player.properties.map((property) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: GestureDetector(
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(40),
+                            child: Image.asset(
+                              property.imageName,
+                              width: 30,
+                              height: 30,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            property.name,
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          );
+        }),
+        actions: [
+          if (player.index != gameManager.currentPlayer.index)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                showDialog(
+                  context: context,
+                  builder: (context) => TradeDialog(
+                    currentPlayer: gameManager.currentPlayer,
+                    targetPlayer: player,
+                    onTradeCompleted: (trade) {
+                      gameManager.addTrade(trade: trade);
+                    },
+                  ),
+                );
+              },
+              child: const Text("Offer Trade"),
+            ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 Widget start() {

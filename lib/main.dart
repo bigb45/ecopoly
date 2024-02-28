@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: ChangeNotifierProvider(
-        create: (context) => GameManager()..setPlayers(4),
+        create: (context) => GameManager()..setPlayers(2),
         child: AnimatedZoomPan(
           transformationController: boardTransformationController,
           child: InteractiveViewer(
