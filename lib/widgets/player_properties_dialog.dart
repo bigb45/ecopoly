@@ -31,12 +31,16 @@ class _PlayerPropertiesDialogState extends State<PlayerPropertiesDialog> {
     Player player = gameManager.players
         .firstWhere((element) => element.index == widget.playerIndex);
     return AlertDialog(
+      backgroundColor: Colors.grey.shade900,
       title: Column(
         children: [
-          Text('${player.name}\'s Properties'),
+          Text(
+            '${player.name}\'s Properties',
+            style: const TextStyle(color: Colors.white),
+          ),
           Text(
             "Money: \$${player.money}",
-            style: const TextStyle(color: Colors.black, fontSize: 14),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
         ],
       ),
@@ -45,14 +49,14 @@ class _PlayerPropertiesDialogState extends State<PlayerPropertiesDialog> {
           return const Center(
             child: Text(
               "No properties owned",
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
           );
         }
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
+            color: Colors.grey.shade900,
           ),
           width: MediaQuery.of(context).size.width * 0.4,
           padding: const EdgeInsets.all(8.0),
@@ -79,7 +83,7 @@ class _PlayerPropertiesDialogState extends State<PlayerPropertiesDialog> {
                         const SizedBox(width: 8),
                         Text(
                           property.name,
-                          style: const TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ],
                     ),
@@ -117,8 +121,12 @@ class _PlayerPropertiesDialogState extends State<PlayerPropertiesDialog> {
                 builder: (BuildContext context) => Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AlertDialog(
+                    backgroundColor: Colors.grey.shade900,
                     actionsAlignment: MainAxisAlignment.center,
-                    content: Text("Are you sure you want to Bankrupt?"),
+                    content: const Text(
+                      "Are you sure you want to Bankrupt?",
+                      style: TextStyle(color: Colors.white),
+                    ),
                     actions: [
                       GameButton(
                         onPressed: () {

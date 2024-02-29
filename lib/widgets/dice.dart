@@ -22,9 +22,7 @@ class _DiceState extends State<Dice> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: widget.canRoll
-                ? widget.playerColor
-                : Colors.black.withOpacity(0.5),
+            color: Colors.black.withOpacity(0.8),
             blurRadius: 10,
             spreadRadius: 5,
           ),

@@ -43,9 +43,11 @@ class _TradeDialogState extends State<TradeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Colors.grey.shade900,
       icon: Icon(
         Icons.swap_horiz,
         size: 36,
+        color: Colors.white,
       ),
       scrollable: true,
       actions: [
@@ -82,6 +84,10 @@ class _TradeDialogState extends State<TradeDialog> {
       title: Text(
         "Trade Offer",
         textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       content: Column(
         children: [
@@ -157,7 +163,7 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
+        color: Colors.grey.shade900,
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -171,11 +177,12 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
                 child: Text(
                   widget.isTrading ? "Your Properties" : "Their Properties",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
               SizedBox(height: 8),
-              Text("\$$selectedMoney"),
+              Text("\$$selectedMoney", style: TextStyle(color: Colors.white)),
               Slider(
                 value: selectedMoney.toDouble(),
                 onChanged: (value) {
@@ -235,11 +242,7 @@ class _PlayerPropertiesListState extends State<PlayerPropertiesList> {
                                 SizedBox(width: 8),
                                 Text(
                                   property.name,
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ],
                             ),

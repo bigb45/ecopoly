@@ -1,4 +1,3 @@
-import 'package:ecopoly/animations/animated_zoom_pan.dart';
 import 'package:ecopoly/game.dart';
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:flutter/material.dart';
@@ -35,14 +34,8 @@ class MyApp extends StatelessWidget {
       ),
       home: ChangeNotifierProvider(
         create: (context) => GameManager()..setPlayers(2),
-        child: AnimatedZoomPan(
-          transformationController: boardTransformationController,
-          child: InteractiveViewer(
-            transformationController: boardTransformationController,
-            child: GameScreen(
-              interactiveBoardController: boardTransformationController,
-            ),
-          ),
+        child: GameScreen(
+          interactiveBoardController: boardTransformationController,
         ),
       ),
     );

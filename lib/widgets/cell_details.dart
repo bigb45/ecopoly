@@ -54,7 +54,7 @@ class CellDetails extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: Container(
                 width: cardWidth,
                 height: cardHeight,

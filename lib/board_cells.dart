@@ -44,15 +44,12 @@ class BoardRow extends StatelessWidget {
               onCityClick(cellIndex + 1);
             },
             child: Container(
-              child: Stack(
-                children: [
-                  _buildSquare(
-                    cell: city,
-                    width: height,
-                    height: width,
-                    centerChild: centerChild,
-                  ),
-                ],
+              color: Color(int.parse("0xFF130F2D")),
+              child: _buildSquare(
+                cell: city,
+                width: height,
+                height: width,
+                centerChild: centerChild,
               ),
             ),
           );
@@ -110,16 +107,12 @@ class BoardColumn extends StatelessWidget {
             child: Stack(
               children: [
                 Container(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      _buildSquare(
-                        cell: city,
-                        width: width,
-                        height: height,
-                        centerChild: centerChild,
-                      ),
-                    ],
+                  // color: Colors.red,
+                  child: _buildSquare(
+                    cell: city,
+                    width: width,
+                    height: height,
+                    centerChild: centerChild,
                   ),
                 ),
               ],
@@ -136,30 +129,25 @@ Widget _buildSquare(
     double height = 50,
     required Cell cell,
     Widget? centerChild}) {
-  return Stack(
-    alignment: Alignment.bottomCenter,
-    children: [
-      BlurryContainer(
-        width: width,
-        height: height,
-        blurStrength: 0.2,
-        cell: cell,
-        centerChild: centerChild,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 4.0),
-          child: Text(
-            cell.name,
-            style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                height: 1),
-            textAlign: TextAlign.center,
-            softWrap: true,
-            overflow: TextOverflow.fade,
-          ),
-        ),
+  return BlurryContainer(
+    width: width,
+    height: height,
+    blurStrength: 0.2,
+    cell: cell,
+    centerChild: centerChild,
+    child: Padding(
+      padding: const EdgeInsets.only(top: 4.0),
+      child: Text(
+        cell.name,
+        style: TextStyle(
+            fontSize: 12,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            height: 1),
+        textAlign: TextAlign.center,
+        softWrap: true,
+        overflow: TextOverflow.fade,
       ),
-    ],
+    ),
   );
 }

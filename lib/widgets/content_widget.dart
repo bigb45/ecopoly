@@ -1,14 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/game_event.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/property.dart';
-import 'package:ecopoly/util/animated_visibility.dart';
-import 'package:ecopoly/util/board.dart';
-import 'package:ecopoly/widgets/dice.dart';
-import 'package:ecopoly/widgets/game_button.dart';
+import 'package:ecopoly/widgets/cell_details.dart';
 import 'package:ecopoly/widgets/player_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,141 +19,33 @@ class ContentWidget extends StatefulWidget {
 }
 
 class _ContentWidgetState extends State<ContentWidget> {
-  late Timer _timer;
-  late int _secondDieValue;
-  late int _firstDieValue;
-  late bool _isRolling;
-  @override
-  void initState() {
-    super.initState();
-    _secondDieValue = 1;
-    _firstDieValue = 1;
-    _isRolling = false;
-  }
-
-  void _rollDice() {
-    final gameManager = Provider.of<GameManager>(context, listen: false);
-
-    if (!_isRolling && !gameManager.rolledDice && gameManager.gameStarted) {
-      setState(() {
-        _isRolling = true;
-      });
-
-      _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-        if (mounted) {
-          setState(() {
-            _secondDieValue = Random().nextInt(6) + 1;
-            _firstDieValue = Random().nextInt(6) + 1;
-          });
-        }
-      });
-
-      Timer(const Duration(seconds: 1), () {
-        setState(() {
-          gameManager.rollDice();
-          _firstDieValue = gameManager.firstDie;
-          _secondDieValue = gameManager.secondDie;
-          _timer.cancel();
-          _isRolling = false;
-        });
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<GameManager>(builder: (context, gameManager, _) {
       return Container(
         color: Color(int.parse("0xFF130F2D")),
+        // color: Colors.greenAccent,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              GestureDetector(
-                onTap: _rollDice,
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Dice(
-                      value: _firstDieValue,
-                      canRoll: !gameManager.rolledDice,
-                      playerColor: gameManager.currentPlayer.color),
-                  const SizedBox(width: 20),
-                  Dice(
-                      value: _secondDieValue,
-                      canRoll: !gameManager.rolledDice,
-                      playerColor: gameManager.currentPlayer.color),
-                ]),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (!gameManager.gameStarted)
-                    AnimatedVisibility(
-                      visible: !gameManager.gameStarted,
-                      child: GameButton(
-                        childText: "Start Game",
-                        onPressed: () {
-                          gameManager.startGame();
-                        },
-                      ),
-                    ),
-                  if (gameManager.gameStarted && !gameManager.rolledDice)
-                    const SizedBox(
-                      width: 20,
-                    ),
-                  if (gameManager.gameStarted && !gameManager.rolledDice)
-                    AnimatedVisibility(
-                      visible: gameManager.gameStarted && !_isRolling,
-                      child: GameButton(
-                          onPressed: !gameManager.rolledDice
-                              ? () {
-                                  _rollDice();
-                                }
-                              : null,
-                          childText: "Roll dice"),
-                    ),
-                  if (gameManager.rolledDice)
-                    const SizedBox(
-                      width: 20,
-                    ),
-                  if (gameManager.rolledDice)
-                    AnimatedVisibility(
-                      visible: gameManager.rolledDice,
-                      child: GameButton(
-                        onPressed: gameManager.currentPlayer.money >= 0
-                            ? () {
-                                gameManager.endTurn();
-                                // _showAnimatedDialog(
-                                //     context,
-                                //     gameManager.currentPlayer.name,
-                                //     gameManager.currentPlayer.color);
-                              }
-                            : null,
-                        childText: "End turn",
-                      ),
-                    ),
-                  if (gameManager.canBuyProperty)
-                    const SizedBox(
-                      width: 20,
-                    ),
-                  if (gameManager.canBuyProperty)
-                    AnimatedVisibility(
-                      visible: gameManager.canBuyProperty,
-                      child: GameButton(
-                          onPressed: gameManager.canBuyProperty &&
-                                  gameManager.currentPlayer.money >=
-                                      (board[gameManager.currentPlayer.position]
-                                              as Property)
-                                          .cost
-                              ? () {
-                                  gameManager.buyProperty();
-                                }
-                              : null,
-                          childText: "Buy Property"),
-                    ),
-                ],
+              AnimatedOpacity(
+                opacity: true ? 1 : 0,
+                duration: Duration(milliseconds: 400),
+                child: Visibility(
+                  visible: true,
+                  child: CellDetails(
+                    cardIndex: 11,
+                    currentPlayerIndex: gameManager.currentPlayer.index,
+                    onClose: () {
+                      // setState(() {
+
+                      //   print("closed");
+                      // });
+                    },
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
               Container(
