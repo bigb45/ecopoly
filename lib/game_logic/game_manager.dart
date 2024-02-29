@@ -69,8 +69,8 @@ class GameManager extends ChangeNotifier {
     firstDie = Random().nextInt(6) + 1;
     secondDie = Random().nextInt(6) + 1;
 
-    // var firstDie = 4;
-    // var secondDie = 2;
+    // var firstDie = 1;
+    // var secondDie = 1;
     int prevPosition = currentPlayer.position;
 
     currentPlayer.position =

@@ -2,6 +2,7 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, unused_local_variable, avoid_print
 
 import 'package:ecopoly/util/trade.dart';
+import 'package:ecopoly/widgets/game_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:ecopoly/models/player.dart';
@@ -48,7 +49,7 @@ class _TradeDialogState extends State<TradeDialog> {
       ),
       scrollable: true,
       actions: [
-        ElevatedButton(
+        GameButton(
           onPressed: isTradeValid
               ? () {
                   widget.onTradeCompleted(Trade(
@@ -69,9 +70,9 @@ class _TradeDialogState extends State<TradeDialog> {
                   Navigator.of(context).pop();
                 }
               : null,
-          child: Text("Offer"),
+          childText: "Offer",
         ),
-        ElevatedButton(
+        TextButton(
           onPressed: () {
             Navigator.pop(context);
           },

@@ -5,12 +5,13 @@ import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/game_event.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/util/animated_visibility.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/dice.dart';
+import 'package:ecopoly/widgets/game_button.dart';
 import 'package:ecopoly/widgets/player_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scidart/numdart.dart';
 
 class ContentWidget extends StatefulWidget {
   const ContentWidget({
@@ -93,69 +94,69 @@ class _ContentWidgetState extends State<ContentWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (!gameManager.gameStarted)
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.white),
+                    AnimatedVisibility(
+                      visible: !gameManager.gameStarted,
+                      child: GameButton(
+                        childText: "Start Game",
+                        onPressed: () {
+                          gameManager.startGame();
+                        },
                       ),
-                      onPressed: () {
-                        gameManager.startGame();
-                      },
-                      child: const Text("Start game"),
                     ),
                   if (gameManager.gameStarted && !gameManager.rolledDice)
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 300),
-                      opacity: gameManager.rolledDice ? 0 : 1,
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                        ),
-                        onPressed: !gameManager.rolledDice
-                            ? () {
-                                _rollDice();
-                              }
-                            : null,
-                        child: const Text("Roll dice"),
-                      ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                  if (gameManager.gameStarted && !gameManager.rolledDice)
+                    AnimatedVisibility(
+                      visible: gameManager.gameStarted && !_isRolling,
+                      child: GameButton(
+                          onPressed: !gameManager.rolledDice
+                              ? () {
+                                  _rollDice();
+                                }
+                              : null,
+                          childText: "Roll dice"),
                     ),
                   if (gameManager.rolledDice)
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.white),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                  if (gameManager.rolledDice)
+                    AnimatedVisibility(
+                      visible: gameManager.rolledDice,
+                      child: GameButton(
+                        onPressed: gameManager.currentPlayer.money >= 0
+                            ? () {
+                                gameManager.endTurn();
+                                // _showAnimatedDialog(
+                                //     context,
+                                //     gameManager.currentPlayer.name,
+                                //     gameManager.currentPlayer.color);
+                              }
+                            : null,
+                        childText: "End turn",
                       ),
-                      onPressed: gameManager.currentPlayer.money >= 0
-                          ? () {
-                              gameManager.endTurn();
-                              _showAnimatedDialog(
-                                  context,
-                                  gameManager.currentPlayer.name,
-                                  gameManager.currentPlayer.color);
-                            }
-                          : null,
-                      child: const Text("End turn"),
                     ),
                   if (gameManager.canBuyProperty)
                     const SizedBox(
                       width: 20,
                     ),
                   if (gameManager.canBuyProperty)
-                    ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                        ),
-                        onPressed: gameManager.currentPlayer.money >=
-                                (board[gameManager.currentPlayer.position]
-                                        as Property)
-                                    .cost
-                            ? () {
-                                gameManager.buyProperty();
-                              }
-                            : null,
-                        child: const Text("Buy Property"))
+                    AnimatedVisibility(
+                      visible: gameManager.canBuyProperty,
+                      child: GameButton(
+                          onPressed: gameManager.canBuyProperty &&
+                                  gameManager.currentPlayer.money >=
+                                      (board[gameManager.currentPlayer.position]
+                                              as Property)
+                                          .cost
+                              ? () {
+                                  gameManager.buyProperty();
+                                }
+                              : null,
+                          childText: "Buy Property"),
+                    ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -292,6 +293,7 @@ Widget getMessageFromEvent(GameEvent event) {
           ),
         ],
       );
+
     case EventType.go:
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -320,16 +322,13 @@ Widget getMessageFromEvent(GameEvent event) {
     case EventType.surprise:
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           playerInText(event.firstPlayer),
-          const Text(
-            " received a charity card: ",
-            style: TextStyle(color: Colors.white),
-          ),
           Flexible(
             fit: FlexFit.loose,
             child: Text(
-              event.message!,
+              " received a surprise card: ${event.message!}",
               style: const TextStyle(color: Colors.white),
               softWrap: true,
               textAlign: TextAlign.center,
@@ -340,16 +339,13 @@ Widget getMessageFromEvent(GameEvent event) {
     case EventType.charity:
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           playerInText(event.firstPlayer),
-          const Text(
-            " received a charity card: ",
-            style: TextStyle(color: Colors.white),
-          ),
           Flexible(
             fit: FlexFit.loose,
             child: Text(
-              event.message!,
+              " received a charity card: ${event.message!} ",
               style: const TextStyle(color: Colors.white),
               softWrap: true,
               textAlign: TextAlign.center,

@@ -3,6 +3,7 @@
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/util/player_position.dart';
 import 'package:ecopoly/widgets/content_widget.dart';
+import 'package:ecopoly/widgets/game_button.dart';
 import 'package:ecopoly/widgets/trade_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
@@ -232,7 +233,7 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -307,7 +308,7 @@ dialogTest(BuildContext context, int playerIndex) {
         }),
         actions: [
           if (player.index != gameManager.currentPlayer.index)
-            ElevatedButton(
+            GameButton(
               onPressed: () {
                 Navigator.pop(context);
                 showDialog(
@@ -321,7 +322,7 @@ dialogTest(BuildContext context, int playerIndex) {
                   ),
                 );
               },
-              child: const Text("Offer Trade"),
+              childText: "Offer Trade",
             ),
           TextButton(
             onPressed: () {

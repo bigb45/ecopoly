@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:ecopoly/widgets/game_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:ecopoly/game_logic/game_manager.dart';
@@ -91,7 +92,7 @@ class _PlayerPropertiesDialogState extends State<PlayerPropertiesDialog> {
       }),
       actions: [
         if (player.index != gameManager.currentPlayer.index)
-          ElevatedButton(
+          GameButton(
             onPressed: () {
               Navigator.pop(context);
               showDialog(
@@ -105,10 +106,10 @@ class _PlayerPropertiesDialogState extends State<PlayerPropertiesDialog> {
                 ),
               );
             },
-            child: const Text("Offer Trade"),
+            childText: "Offer Trade",
           ),
         if (player.index == gameManager.currentPlayer.index)
-          ElevatedButton(
+          GameButton(
             onPressed: () {
               Navigator.pop(context);
               showDialog(
@@ -119,37 +120,26 @@ class _PlayerPropertiesDialogState extends State<PlayerPropertiesDialog> {
                     actionsAlignment: MainAxisAlignment.center,
                     content: Text("Are you sure you want to Bankrupt?"),
                     actions: [
-                      ElevatedButton(
+                      GameButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text("Cancel"),
+                        childText: "Cancel",
                       ),
-                      ElevatedButton(
+                      GameButton(
                         onPressed: () {
                           gameManager.quit(gameManager.currentPlayer.index);
 
                           Navigator.pop(context);
                         },
-                        child: Text(
-                          "Bankrupt",
-                          style: TextStyle(
-                              color: ColorScheme.fromSeed(
-                                      seedColor: Colors.deepPurple)
-                                  .error),
-                        ),
+                        childText: "Bankrupt",
                       ),
                     ],
                   ),
                 ),
               );
             },
-            child: Text(
-              "Bankrupt",
-              style: TextStyle(
-                  color:
-                      ColorScheme.fromSeed(seedColor: Colors.deepPurple).error),
-            ),
+            childText: "Bankrupt",
           ),
         TextButton(
           onPressed: () {
