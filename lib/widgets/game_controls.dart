@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/property.dart';
-import 'package:ecopoly/util/animated_visibility.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/dice.dart';
 import 'package:ecopoly/widgets/game_button.dart';
@@ -52,8 +51,8 @@ class GameControlsState extends State<GameControls> {
       });
 
       Timer(const Duration(seconds: 1), () {
+        gameManager.rollDice();
         setState(() {
-          gameManager.rollDice();
           _firstDieValue = gameManager.firstDie;
           _secondDieValue = gameManager.secondDie;
           _timer.cancel();
@@ -85,70 +84,67 @@ class GameControlsState extends State<GameControls> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (gameManager.currentPlayer.isInJail)
+              GameButton(
+                childText: "Get out for \$50",
+                onPressed: gameManager.currentPlayer.money >= 50
+                    ? () {
+                        gameManager.getOutOfJail();
+                      }
+                    : null,
+              ),
             if (!gameManager.gameStarted)
-              AnimatedVisibility(
-                visible: !gameManager.gameStarted,
-                child: GameButton(
-                  childText: "Start Game",
-                  onPressed: () {
-                    gameManager.startGame();
-                  },
-                ),
+              GameButton(
+                childText: "Start Game",
+                onPressed: () {
+                  gameManager.startGame();
+                },
               ),
             if (gameManager.gameStarted && !gameManager.rolledDice)
               const SizedBox(
                 width: 20,
               ),
             if (gameManager.gameStarted && !gameManager.rolledDice)
-              AnimatedVisibility(
-                visible: gameManager.gameStarted && !_isRolling,
-                child: GameButton(
-                    onPressed: !gameManager.rolledDice
-                        ? () {
-                            _rollDice();
-                          }
-                        : null,
-                    childText: "Roll dice"),
-              ),
-            if (gameManager.rolledDice)
-              const SizedBox(
-                width: 20,
-              ),
-            if (gameManager.rolledDice)
-              AnimatedVisibility(
-                visible: gameManager.rolledDice,
-                child: GameButton(
-                  onPressed: gameManager.currentPlayer.money >= 0
+              GameButton(
+                  onPressed: !gameManager.rolledDice
                       ? () {
-                          gameManager.endTurn();
-                          // _showAnimatedDialog(
-                          //     context,
-                          //     gameManager.currentPlayer.name,
-                          //     gameManager.currentPlayer.color);
+                          _rollDice();
                         }
                       : null,
-                  childText: "End turn",
-                ),
+                  childText: "Roll dice"),
+            if (gameManager.rolledDice)
+              const SizedBox(
+                width: 20,
+              ),
+            if (gameManager.rolledDice)
+              GameButton(
+                onPressed: gameManager.currentPlayer.money >= 0
+                    ? () {
+                        gameManager.endTurn();
+                        // _showAnimatedDialog(
+                        //     context,
+                        //     gameManager.currentPlayer.name,
+                        //     gameManager.currentPlayer.color);
+                      }
+                    : null,
+                childText: "End turn",
               ),
             if (gameManager.canBuyProperty)
               const SizedBox(
                 width: 20,
               ),
             if (gameManager.canBuyProperty)
-              AnimatedVisibility(
-                visible: gameManager.canBuyProperty,
-                child: GameButton(
-                    onPressed: gameManager.canBuyProperty &&
-                            gameManager.currentPlayer.money >=
-                                (board[gameManager.currentPlayer.position]
-                                        as Property)
-                                    .cost
-                        ? () {
-                            gameManager.buyProperty();
-                          }
-                        : null,
-                    childText: "Buy Property"),
-              ),
+              GameButton(
+                  onPressed: gameManager.canBuyProperty &&
+                          gameManager.currentPlayer.money >=
+                              (board[gameManager.currentPlayer.position]
+                                      as Property)
+                                  .cost
+                      ? () {
+                          gameManager.buyProperty();
+                        }
+                      : null,
+                  childText: "Buy Property"),
           ],
         ),
       ],

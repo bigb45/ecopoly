@@ -35,16 +35,6 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  bool infoCardOpen = false;
-  int infoCardIndex = 0;
-
-  void onCityClick(int index) {
-    setState(() {
-      infoCardOpen = true;
-      infoCardIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final gameManager = Provider.of<GameManager>(context);
@@ -81,22 +71,26 @@ class _GameScreenState extends State<GameScreen> {
                           BoardRow(
                                   index: 0,
                                   cities: board.sublist(1, 10),
-                                  onCityClick: ((index) => onCityClick(index)))
+                                  onCityClick: ((index) =>
+                                      gameManager.openInfoCard(index)))
                               .inGridArea('city1'),
                           BoardColumn(
                                   index: 1,
                                   cities: board.sublist(11, 20),
-                                  onCityClick: ((index) => onCityClick(index)))
+                                  onCityClick: ((index) =>
+                                      gameManager.openInfoCard(index)))
                               .inGridArea('city2'),
                           BoardRow(
                                   index: 2,
                                   cities: board.sublist(21, 30),
-                                  onCityClick: ((index) => onCityClick(index)))
+                                  onCityClick: ((index) =>
+                                      gameManager.openInfoCard(index)))
                               .inGridArea('city4'),
                           BoardColumn(
                                   index: 3,
                                   cities: board.sublist(31),
-                                  onCityClick: ((index) => onCityClick(index)))
+                                  onCityClick: ((index) =>
+                                      gameManager.openInfoCard(index)))
                               .inGridArea('city3'),
                           jail().inGridArea('jail'),
                           jail().inGridArea('gotojail'),
@@ -194,7 +188,6 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
-            // const Spacer(),
             const SizedBox(
               width: 30,
             ),
@@ -216,23 +209,6 @@ class _GameScreenState extends State<GameScreen> {
                 const Spacer(),
                 GameControls(gameManager: gameManager),
                 const Spacer(),
-                // AnimatedOpacity(
-                //   opacity: infoCardOpen ? 1 : 0,
-                //   duration: Duration(milliseconds: 400),
-                //   child: Visibility(
-                //     visible: infoCardOpen,
-                //     child: CellDetails(
-                //       cardIndex: infoCardIndex,
-                //       currentPlayerIndex: gameManager.currentPlayer.index,
-                //       onClose: () {
-                //         setState(() {
-                //           infoCardOpen = false;
-                //           print("closed");
-                //         });
-                //       },
-                //     ),
-                //   ),
-                // ),
               ],
             ),
             // const Spacer(),

@@ -8,8 +8,6 @@ import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:flutter/material.dart';
 
-const flagSize = 60.0;
-
 class CellDetails extends StatelessWidget {
   final int cardIndex;
   final int currentPlayerIndex;
@@ -23,8 +21,8 @@ class CellDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Cell cell = board[cardIndex];
-    final cardWidth = MediaQuery.of(context).size.width * 0.3;
-    final cardHeight = MediaQuery.of(context).size.height * 0.5;
+    final cardWidth = MediaQuery.of(context).size.width * 0.4;
+    final cardHeight = MediaQuery.of(context).size.height * 0.6;
     return Container(
       width: cardWidth,
       height: cardHeight,
@@ -92,7 +90,7 @@ class CellDetails extends StatelessWidget {
                     ),
                     Text(
                       cell.type.name.toUpperCase(),
-                      style: const TextStyle(fontSize: 10, color: Colors.white),
+                      style: const TextStyle(fontSize: 12, color: Colors.white),
                     ),
                     if (cell.type == CellType.charity)
                       const Text(
@@ -148,7 +146,7 @@ Widget bikelaneInfo(Property cell) {
           ),
           Text(
             cell.type.name.toUpperCase(),
-            style: const TextStyle(fontSize: 10, color: Colors.white),
+            style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
           Row(
             children: [
@@ -165,7 +163,7 @@ Widget bikelaneInfo(Property cell) {
                     child: Text(
                       cell.owner?.name ?? "Not owned",
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 14,
                         color: Colors.white,
                       ),
                     ),
@@ -198,14 +196,14 @@ Widget bikeRow(int bikeLanes, int rent, double multiplier) {
             ? "With $bikeLanes Bike lanes"
             : "With $bikeLanes Bike lane",
         style: const TextStyle(
-          fontSize: 10,
+          fontSize: 14,
           color: Colors.white,
         ),
       ),
       const Spacer(),
       Text(
         "\$${(rent * multiplier).round()}",
-        style: const TextStyle(fontSize: 10, color: Colors.white),
+        style: const TextStyle(fontSize: 14, color: Colors.white),
       ),
     ],
   );
@@ -229,7 +227,7 @@ Widget utilityInfo(Property cell) {
           ),
           Text(
             cell.type.name.toUpperCase(),
-            style: const TextStyle(fontSize: 10, color: Colors.white),
+            style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
           Align(
             alignment: Alignment.centerLeft,
@@ -244,7 +242,7 @@ Widget utilityInfo(Property cell) {
                 child: Text(
                   cell.owner?.name ?? "Not owned",
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 14,
                     color: Colors.white,
                   ),
                 ),
@@ -255,7 +253,7 @@ Widget utilityInfo(Property cell) {
             "If one Utility is owned, rent is 4x the dice roll, if both Utilities are owned, rent is 4x the dice roll",
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -283,7 +281,7 @@ Widget taxInfo(Tax cell) {
           ),
           Text(
             cell.type.name.toUpperCase(),
-            style: const TextStyle(fontSize: 10, color: Colors.white),
+            style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
           if (cell.amount != null)
             Text(
@@ -328,7 +326,7 @@ Widget propertyInfo(Property cell, {required int currentPlayerIndex}) {
           ),
           Text(
             cell.type.name.toUpperCase(),
-            style: const TextStyle(fontSize: 10, color: Colors.white),
+            style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -346,7 +344,7 @@ Widget propertyInfo(Property cell, {required int currentPlayerIndex}) {
                     child: Text(
                       cell.owner?.name ?? "Not owned",
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 14,
                         color: Colors.white,
                       ),
                     ),
@@ -462,17 +460,17 @@ Widget rent(
       children: [
         const Text(
           "with Forest",
-          style: TextStyle(fontSize: 10, color: Colors.white),
+          style: TextStyle(fontSize: 14, color: Colors.white),
         ),
         const Spacer(),
         Text("\$${(rent * multiplier * 7).round()}",
-            style: const TextStyle(fontSize: 10, color: Colors.white))
+            style: const TextStyle(fontSize: 14, color: Colors.white))
       ],
     ),
     Text(
       "Mortgage Value \$${(basePrice * 0.5).round()}",
       style: const TextStyle(
-        fontSize: 10,
+        fontSize: 14,
         color: Colors.white,
       ),
     ),
@@ -488,7 +486,7 @@ Widget rent(
             Text(
               "\$$basePrice",
               style: const TextStyle(
-                fontSize: 10,
+                fontSize: 14,
                 color: Colors.white,
               ),
             ),
@@ -505,7 +503,7 @@ Widget rent(
             Text(
               "\$${(basePrice * 0.5).round()}",
               style: const TextStyle(
-                fontSize: 10,
+                fontSize: 14,
                 color: Colors.white,
               ),
             ),
@@ -522,7 +520,7 @@ Widget rent(
             Text(
               "\$${(basePrice * 0.5).round()}",
               style: const TextStyle(
-                fontSize: 10,
+                fontSize: 14,
                 color: Colors.white,
               ),
             ),
@@ -539,14 +537,14 @@ Widget rentRow(rent, multiplier, trees) {
       Text(
         trees > 1 ? "With $trees Trees" : "With $trees Tree",
         style: const TextStyle(
-          fontSize: 10,
+          fontSize: 14,
           color: Colors.white,
         ),
       ),
       const Spacer(),
       Text(
         "\$${(rent * multiplier).round()}",
-        style: const TextStyle(fontSize: 10, color: Colors.white),
+        style: const TextStyle(fontSize: 14, color: Colors.white),
       ),
     ],
   );

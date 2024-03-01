@@ -26,6 +26,8 @@ class GameManager extends ChangeNotifier {
   bool rolledDice = false;
   bool canBuyProperty = false;
   int doublesCount = 0;
+  bool infoCardOpen = false;
+  int infoCardIndex = 0;
   List<GameEvent> gameEvents = [];
   var firstDie = 1;
   var secondDie = 1;
@@ -69,34 +71,66 @@ class GameManager extends ChangeNotifier {
     firstDie = Random().nextInt(6) + 1;
     secondDie = Random().nextInt(6) + 1;
 
-    // var firstDie = 1;
-    // var secondDie = 1;
+    // firstDie = 1;
+    // secondDie = 1;
+
     int prevPosition = currentPlayer.position;
-
-    currentPlayer.position =
-        (currentPlayer.position + (firstDie + secondDie)) % 40;
-    print("player ${currentPlayer.name} rolled a $firstDie and $secondDie");
-    updatePosition(currentPlayer.xPosition, currentPlayer.yPosition,
-        currentPlayer.position);
-
-    if (firstDie == secondDie) {
-      rolledDice = false;
-      doublesCount++;
+    if (currentPlayer.isInJail) {
+      if (currentPlayer.jailTurns == 3 || firstDie == secondDie) {
+        currentPlayer.isInJail = false;
+        currentPlayer.jailTurns = 0;
+        if (firstDie == secondDie) {
+          currentPlayer.position =
+              (currentPlayer.position + (firstDie + secondDie)) % 40;
+          print(
+              "player ${currentPlayer.name} rolled a $firstDie and $secondDie");
+          updatePosition(currentPlayer.xPosition, currentPlayer.yPosition,
+              currentPlayer.position);
+        }
+        print("player ${currentPlayer.name} spent 3 turns in jail and got out");
+        endTurn();
+        notifyListeners();
+      } else {
+        currentPlayer.jailTurns++;
+        print("player ${currentPlayer.name} failed to roll a double");
+        endTurn();
+        notifyListeners();
+      }
+      return (firstDie, secondDie);
     } else {
-      rolledDice = true;
-      doublesCount = 0;
+      currentPlayer.position =
+          (currentPlayer.position + (firstDie + secondDie)) % 40;
+      print("player ${currentPlayer.name} rolled a $firstDie and $secondDie");
+      updatePosition(currentPlayer.xPosition, currentPlayer.yPosition,
+          currentPlayer.position);
+
+      if (firstDie == secondDie) {
+        rolledDice = false;
+        doublesCount++;
+      } else {
+        rolledDice = true;
+        doublesCount = 0;
+      }
+      if (doublesCount == doublesLimit) {
+        rolledDice = true;
+        doublesCount = 0;
+        sendToJail();
+        print(
+            "Player ${currentPlayer.name} rolled doubles 3 times in a row, go to jail");
+      }
+      CellType cellType = board[currentPlayer.position].type;
+      _handleNewPlayerPosition(cellType, prevPosition);
+      notifyListeners();
+      return (firstDie, secondDie);
     }
-    if (doublesCount == doublesLimit) {
-      rolledDice = true;
-      doublesCount = 0;
-      sendToJail();
-      print(
-          "Player ${currentPlayer.name} rolled doubles 3 times in a row, go to jail");
-    }
-    CellType cellType = board[currentPlayer.position].type;
-    _handleNewPlayerPosition(cellType, prevPosition);
-    notifyListeners();
-    return (firstDie, secondDie);
+  }
+
+  void getOutOfJail() {
+    currentPlayer.money -= 50;
+    print("player ${currentPlayer.name} paid 50 to get out of jail");
+    currentPlayer.isInJail = false;
+    currentPlayer.jailTurns = 0;
+    endTurn();
   }
 
   void sendToJail() {
@@ -105,6 +139,7 @@ class GameManager extends ChangeNotifier {
     canBuyProperty = false;
     updatePosition(
         currentPlayer.xPosition, currentPlayer.yPosition, jailPosition);
+    endTurn();
   }
 
   void _handleNewPlayerPosition(CellType cellType, int prevPosition) {
@@ -129,7 +164,6 @@ class GameManager extends ChangeNotifier {
       currentPlayer.money += 200;
       print("Player ${currentPlayer.name} passed go, received 200");
       notifyListeners();
-      return;
     }
 
     // if the player lands on tax
@@ -212,6 +246,7 @@ class GameManager extends ChangeNotifier {
       return;
     }
 
+    // if the player lands on a chance
     if (cellType == CellType.chance) {
       GameCard card = drawSurpriseCard();
       currentPlayer.money += card.amount;
@@ -227,6 +262,8 @@ class GameManager extends ChangeNotifier {
       notifyListeners();
       return;
     }
+
+    // if the player lands on a charity
     if (cellType == CellType.charity) {
       GameCard card = drawCharityCard();
       currentPlayer.money += card.amount;
@@ -242,6 +279,17 @@ class GameManager extends ChangeNotifier {
       notifyListeners();
       return;
     }
+  }
+
+  void openInfoCard(int index) {
+    infoCardOpen = true;
+    infoCardIndex = index;
+    notifyListeners();
+  }
+
+  void closeInfoCard() {
+    infoCardOpen = false;
+    notifyListeners();
   }
 
   GameCard drawCharityCard() {

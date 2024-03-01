@@ -10,6 +10,7 @@ class Player {
   int position = 0;
   int xPosition = 0;
   int yPosition = 0;
+  int jailTurns = 0;
   bool isInJail = false;
   PlayerStatus status = PlayerStatus.playing;
   final int index;

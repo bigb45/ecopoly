@@ -30,21 +30,15 @@ class _ContentWidgetState extends State<ContentWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              AnimatedOpacity(
-                opacity: true ? 1 : 0,
-                duration: Duration(milliseconds: 400),
-                child: Visibility(
-                  visible: true,
-                  child: CellDetails(
-                    cardIndex: 11,
-                    currentPlayerIndex: gameManager.currentPlayer.index,
-                    onClose: () {
-                      // setState(() {
-
-                      //   print("closed");
-                      // });
-                    },
-                  ),
+              AnimatedScale(
+                duration: const Duration(milliseconds: 300),
+                scale: gameManager.infoCardOpen ? 1.0 : 0.0,
+                child: CellDetails(
+                  cardIndex: gameManager.infoCardIndex,
+                  currentPlayerIndex: gameManager.currentPlayer.index,
+                  onClose: () {
+                    gameManager.closeInfoCard();
+                  },
                 ),
               ),
               const SizedBox(height: 20),
