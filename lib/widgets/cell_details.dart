@@ -12,10 +12,12 @@ class CellDetails extends StatelessWidget {
   final int cardIndex;
   final int currentPlayerIndex;
   final VoidCallback onClose;
+  final Function(Property) onSell;
   const CellDetails(
       {super.key,
       required this.cardIndex,
       required this.onClose,
+      required this.onSell,
       required this.currentPlayerIndex});
 
   @override
@@ -118,7 +120,9 @@ class CellDetails extends StatelessWidget {
             ),
           if (cell is Property &&
               (cell.type != CellType.bikelane && cell.type != CellType.utility))
-            propertyInfo(cell, currentPlayerIndex: currentPlayerIndex),
+            propertyInfo(cell,
+                currentPlayerIndex: currentPlayerIndex,
+                onSell: (Property cell) => onSell(cell as Property)),
           if (cell is Tax) taxInfo(cell),
           if (cell.type == CellType.utility) utilityInfo(cell as Property),
           if (cell.type == CellType.bikelane) bikelaneInfo(cell as Property)
@@ -309,7 +313,9 @@ Widget taxInfo(Tax cell) {
   );
 }
 
-Widget propertyInfo(Property cell, {required int currentPlayerIndex}) {
+Widget propertyInfo(Property cell,
+    {required int currentPlayerIndex,
+    required Function(Property property) onSell}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
     child: Center(
@@ -360,8 +366,8 @@ Widget propertyInfo(Property cell, {required int currentPlayerIndex}) {
                     print("Destroy");
                   },
                   onSell: () {
-                    print(
-                        "player index ${currentPlayerIndex} sold ${cell.name}");
+                    print("player index $currentPlayerIndex sold ${cell.name}");
+                    onSell(cell);
                   },
                 )
             ],
@@ -389,7 +395,7 @@ List<Widget> propertyManagement(
               color: Colors.black.withOpacity(0.5),
               spreadRadius: 1,
               blurRadius: 6,
-              offset: Offset(0, 0),
+              offset: const Offset(0, 0),
             ),
           ],
           color: Colors.green,
@@ -413,7 +419,7 @@ List<Widget> propertyManagement(
               color: Colors.black.withOpacity(0.5),
               spreadRadius: 1,
               blurRadius: 6,
-              offset: Offset(0, 0),
+              offset: const Offset(0, 0),
             ),
           ],
           color: Colors.red,
@@ -434,7 +440,7 @@ List<Widget> propertyManagement(
               color: Colors.black.withOpacity(0.5),
               spreadRadius: 1,
               blurRadius: 6,
-              offset: Offset(0, 0),
+              offset: const Offset(0, 0),
             ),
           ],
           borderRadius: BorderRadius.circular(100),
@@ -468,7 +474,7 @@ Widget rent(
       ],
     ),
     Text(
-      "Mortgage Value \$${(basePrice * 0.5).round()}",
+      "Sell Value \$${(basePrice * 0.8).round()}",
       style: const TextStyle(
         fontSize: 14,
         color: Colors.white,
@@ -479,7 +485,7 @@ Widget rent(
         Column(
           children: [
             const Icon(
-              Icons.water_drop,
+              Icons.monetization_on_rounded,
               size: 16,
               color: Colors.white,
             ),

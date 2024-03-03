@@ -31,4 +31,5 @@ enum EventType {
   gameStart,
   surprise,
   charity,
+  sell,
 }

@@ -71,8 +71,8 @@ class GameManager extends ChangeNotifier {
     firstDie = Random().nextInt(6) + 1;
     secondDie = Random().nextInt(6) + 1;
 
-    // firstDie = 1;
-    // secondDie = 1;
+    // firstDie = 4;
+    // secondDie = 4;
 
     int prevPosition = currentPlayer.position;
     if (currentPlayer.isInJail) {
@@ -84,8 +84,7 @@ class GameManager extends ChangeNotifier {
               (currentPlayer.position + (firstDie + secondDie)) % 40;
           print(
               "player ${currentPlayer.name} rolled a $firstDie and $secondDie");
-          updatePosition(currentPlayer.xPosition, currentPlayer.yPosition,
-              currentPlayer.position);
+          updatePosition(firstDie + secondDie);
         }
         print("player ${currentPlayer.name} spent 3 turns in jail and got out");
         endTurn();
@@ -101,8 +100,7 @@ class GameManager extends ChangeNotifier {
       currentPlayer.position =
           (currentPlayer.position + (firstDie + secondDie)) % 40;
       print("player ${currentPlayer.name} rolled a $firstDie and $secondDie");
-      updatePosition(currentPlayer.xPosition, currentPlayer.yPosition,
-          currentPlayer.position);
+      updatePosition(firstDie + secondDie);
 
       if (firstDie == secondDie) {
         rolledDice = false;
@@ -134,11 +132,8 @@ class GameManager extends ChangeNotifier {
   }
 
   void sendToJail() {
-    currentPlayer.position = jailPosition;
-    currentPlayer.isInJail = true;
+    currentPlayer.goToJail();
     canBuyProperty = false;
-    updatePosition(
-        currentPlayer.xPosition, currentPlayer.yPosition, jailPosition);
     endTurn();
   }
 
@@ -162,6 +157,16 @@ class GameManager extends ChangeNotifier {
         currentPlayer.position != 0 &&
         !currentPlayer.isInJail) {
       currentPlayer.money += 200;
+      gameEvents.insert(
+        0,
+        GameEvent(
+            message: "",
+            firstPlayer: currentPlayer,
+            secondPlayer: null,
+            property: null,
+            amount: null,
+            type: EventType.passGo),
+      );
       print("Player ${currentPlayer.name} passed go, received 200");
       notifyListeners();
     }
@@ -324,15 +329,11 @@ class GameManager extends ChangeNotifier {
     Property property = board[currentPlayer.position] as Property;
 
     canBuyProperty = false;
-    currentPlayer.money -= (board[currentPlayer.position] as Property).cost;
-    currentPlayer.properties.add(board[currentPlayer.position] as Property);
-    property.owner = currentPlayer;
-    List<String> properties = currentPlayer.properties
-        .map((property) => property.name)
-        .toList()
-        .cast<String>();
+
+    currentPlayer.buyProperty(property);
+
     print(
-        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}, ${currentPlayer.name} now has $properties");
+        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}");
     gameEvents.insert(
         0,
         GameEvent(
@@ -345,6 +346,20 @@ class GameManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  void sellProperty(Property property) {
+    currentPlayer.sellProperty(property);
+    gameEvents.insert(
+        0,
+        GameEvent(
+            message: "",
+            firstPlayer: currentPlayer,
+            secondPlayer: null,
+            amount: null,
+            property: property,
+            type: EventType.sell));
+    notifyListeners();
+  }
+
   void endTurn() {
     currentPlayer = _nextPlayer();
     rolledDice = false;
@@ -354,12 +369,8 @@ class GameManager extends ChangeNotifier {
   }
 
   void quit(int playerIndex) {
-    print("player ${playerIndex} quit the game");
     Player player = players.firstWhere((player) => player.index == playerIndex);
-    player.status = PlayerStatus.bankrupt;
-    for (var property in player.properties) {
-      property.owner = null;
-    }
+    player.quit();
     endTurn();
     players.remove(player);
 
@@ -384,28 +395,10 @@ class GameManager extends ChangeNotifier {
     print("Game ended");
   }
 
-  (int, int) updatePosition(int x, int y, int targetCell) {
-    int distanceToTraverse = targetCell - getIndex(x, y);
-    int xPosition = x;
-    int yPosition = y;
+  void updatePosition(steps) {
+    currentPlayer.movePlayer(steps: steps);
 
-    while (distanceToTraverse != 0) {
-      if (xPosition == 0 && yPosition < gridWidth - 1) {
-        yPosition++;
-      } else if (yPosition == gridWidth - 1 && xPosition < gridWidth - 1) {
-        xPosition++;
-      } else if (xPosition == gridWidth - 1 && yPosition > 0) {
-        yPosition--;
-      } else if (yPosition == 0 && xPosition > 0) {
-        xPosition--;
-      }
-
-      distanceToTraverse = targetCell - getIndex(xPosition, yPosition);
-    }
-    currentPlayer.xPosition = xPosition;
-    currentPlayer.yPosition = yPosition;
     notifyListeners();
-    return (xPosition, yPosition);
   }
 
   int getIndex(int x, int y) {

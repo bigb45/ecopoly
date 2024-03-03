@@ -16,14 +16,4 @@ class Property extends Cell {
       required super.type,
       required super.imageName,
       required this.setIndex});
-
-  bool buyProperty(Player player) {
-    if (player.money < cost) {
-      return false;
-    } else {
-      player.money -= cost;
-      player.properties.add(this);
-      return true;
-    }
-  }
 }

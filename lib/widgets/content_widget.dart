@@ -36,6 +36,8 @@ class _ContentWidgetState extends State<ContentWidget> {
                 child: CellDetails(
                   cardIndex: gameManager.infoCardIndex,
                   currentPlayerIndex: gameManager.currentPlayer.index,
+                  onSell: (Property property) =>
+                      gameManager.sellProperty(property),
                   onClose: () {
                     gameManager.closeInfoCard();
                   },
@@ -194,13 +196,16 @@ Widget getMessageFromEvent(GameEvent event) {
         children: [
           playerInText(event.firstPlayer),
           const Text(
-            " passed Start and received \$300 ",
+            " passed Start and received \$200 ",
             style: TextStyle(color: Colors.white),
           ),
         ],
       );
     case EventType.gameStart:
-      return const Text('The game has started');
+      return const Text(
+        'The game has started',
+        style: TextStyle(color: Colors.white),
+      );
     case EventType.surprise:
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -233,6 +238,19 @@ Widget getMessageFromEvent(GameEvent event) {
               textAlign: TextAlign.center,
             ),
           ),
+        ],
+      );
+
+    case EventType.sell:
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          playerInText(event.firstPlayer),
+          const Text(
+            " sold ",
+            style: TextStyle(color: Colors.white),
+          ),
+          propertyInText(event.property!),
         ],
       );
 
