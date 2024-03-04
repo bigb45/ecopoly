@@ -1,5 +1,6 @@
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/widgets/animated_shadow_container.dart';
 import 'package:flutter/material.dart';
 
 const cellRadius = 12.0;
@@ -54,23 +55,26 @@ class BlurryContainer extends StatelessWidget {
         ),
 
         // player ownership shadow
-        child: Container(
+        child: AnimatedShadowContainer(
+          cellRadius: cellRadius,
+          ownerColor: isProperty ? (cell as Property).owner?.color : null,
           width: width,
           height: height,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(cellRadius),
-            boxShadow: [
-              BoxShadow(
-                color: isProperty
-                    ? (cell as Property).owner?.color ?? Colors.transparent
-                    : Colors.transparent,
-                spreadRadius: 10,
-                blurRadius: 10,
-                offset: const Offset(0, 0),
-              ),
-            ],
-          ),
+          isProperty: isProperty,
+          // decoration: BoxDecoration(
+          //   color: Colors.transparent,
+          //   borderRadius: BorderRadius.circular(cellRadius),
+          //   boxShadow: [
+          //     BoxShadow(
+          //       color: isProperty
+          //           ? (cell as Property).owner?.color ?? Colors.transparent
+          //           : Colors.transparent,
+          //       spreadRadius: 10,
+          //       blurRadius: 10,
+          //       offset: const Offset(0, 0),
+          //     ),
+          //   ],
+          // ),
           child: Stack(
             alignment: Alignment.bottomCenter,
             children: [
@@ -84,9 +88,6 @@ class BlurryContainer extends StatelessWidget {
                 ),
               ),
               Container(
-                width: width,
-                height: height,
-
                 // opacity over the whole cell
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.4),

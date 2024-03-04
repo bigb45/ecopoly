@@ -122,17 +122,17 @@ class CellDetails extends StatelessWidget {
               (cell.type != CellType.bikelane && cell.type != CellType.utility))
             propertyInfo(cell,
                 currentPlayerIndex: currentPlayerIndex,
-                onSell: (Property cell) => onSell(cell as Property)),
+                onSell: (Property cell) => onSell(cell)),
           if (cell is Tax) taxInfo(cell),
           if (cell.type == CellType.utility) utilityInfo(cell as Property),
-          if (cell.type == CellType.bikelane) bikelaneInfo(cell as Property)
+          if (cell.type == CellType.bikelane) bikeInfo(cell as Property)
         ],
       ),
     );
   }
 }
 
-Widget bikelaneInfo(Property cell) {
+Widget bikeInfo(Property cell) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
     child: Center(
@@ -185,14 +185,14 @@ Widget bikelaneInfo(Property cell) {
 
 Widget bikeLaneRent(int rent) {
   return Column(children: [
-    bikeRow(1, 25, 1),
-    bikeRow(2, 25, 2),
-    bikeRow(3, 25, 4),
-    bikeRow(4, 25, 8),
+    bikeInfoRow(1, 25, 1),
+    bikeInfoRow(2, 25, 2),
+    bikeInfoRow(3, 25, 4),
+    bikeInfoRow(4, 25, 8),
   ]);
 }
 
-Widget bikeRow(int bikeLanes, int rent, double multiplier) {
+Widget bikeInfoRow(int bikeLanes, int rent, double multiplier) {
   return Row(
     children: [
       Text(
