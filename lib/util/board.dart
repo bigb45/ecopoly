@@ -1,7 +1,9 @@
+import 'package:ecopoly/models/bike_lane.dart';
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/models/card.dart';
+import 'package:ecopoly/models/utility.dart';
 
 List<Cell> board = [
   Cell(
@@ -37,13 +39,12 @@ List<Cell> board = [
       imageName: "assets/images/tax.png",
       name: "Income Tax",
       index: 4),
-  Property(
+  BikeLane(
     cost: 200,
     rent: 25,
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 5,
-    type: CellType.bikelane,
     setIndex: 8,
   ),
   Property(
@@ -94,13 +95,12 @@ List<Cell> board = [
     type: CellType.property,
     setIndex: 2,
   ),
-  Property(
+  Utility(
     cost: 150,
     rent: 10,
     imageName: "assets/images/solaris.png",
     name: "Solaris Energy",
     index: 12,
-    type: CellType.utility,
     setIndex: 9,
   ),
 
@@ -122,13 +122,12 @@ List<Cell> board = [
     type: CellType.property,
     setIndex: 2,
   ),
-  Property(
+  BikeLane(
     cost: 200,
     rent: 25,
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 15,
-    type: CellType.bikelane,
     setIndex: 8,
   ),
   Property(
@@ -202,13 +201,12 @@ List<Cell> board = [
     type: CellType.property,
     setIndex: 4,
   ),
-  Property(
+  BikeLane(
     cost: 200,
     rent: 25,
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 25,
-    type: CellType.bikelane,
     setIndex: 8,
   ),
   Property(
@@ -229,13 +227,12 @@ List<Cell> board = [
     type: CellType.property,
     setIndex: 5,
   ),
-  Property(
+  Utility(
     cost: 150,
     rent: 20,
     imageName: "assets/images/recycling.jpg",
     name: "Recycling Plant",
     index: 28,
-    type: CellType.utility,
     setIndex: 9,
   ),
   Property(
@@ -286,13 +283,12 @@ List<Cell> board = [
     type: CellType.property,
     setIndex: 6,
   ),
-  Property(
+  BikeLane(
     cost: 200,
     rent: 25,
     imageName: "assets/images/bike_lane.png",
     name: "Bike lane",
     index: 35,
-    type: CellType.bikelane,
     setIndex: 8,
   ),
   Cell(

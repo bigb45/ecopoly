@@ -68,6 +68,14 @@ class Player {
     yPosition = yPosition;
   }
 
+  void payRent(int rent) {
+    money -= rent;
+  }
+
+  void receiveRent(int rent) {
+    money += rent;
+  }
+
   int getIndex(int x, int y) {
     if (y <= x) {
       return x + y;

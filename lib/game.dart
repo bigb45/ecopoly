@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, unused_local_variable, avoid_print
 
 import 'package:ecopoly/util/player_position.dart';
-import 'package:ecopoly/widgets/animated_shadow_container.dart';
 import 'package:ecopoly/widgets/content_widget.dart';
 import 'package:ecopoly/widgets/game_controls.dart';
 import 'package:flutter/material.dart';

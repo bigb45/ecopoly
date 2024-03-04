@@ -2,12 +2,14 @@
 
 import 'dart:math';
 
+import 'package:ecopoly/models/bike_lane.dart';
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/game_event.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/player_status.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
+import 'package:ecopoly/models/utility.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/util/trade.dart';
 import 'package:flutter/material.dart';
@@ -68,12 +70,11 @@ class GameManager extends ChangeNotifier {
   }
 
   (int, int) rollDice() {
-    firstDie = Random().nextInt(6) + 1;
-    secondDie = Random().nextInt(6) + 1;
+    // firstDie = Random().nextInt(6) + 1;
+    // secondDie = Random().nextInt(6) + 1;
 
-    // firstDie = 4;
-    // secondDie = 4;
-
+    firstDie = 4;
+    secondDie = 4;
     int prevPosition = currentPlayer.position;
     if (currentPlayer.isInJail) {
       if (currentPlayer.jailTurns == 3 || firstDie == secondDie) {
@@ -195,21 +196,34 @@ class GameManager extends ChangeNotifier {
     if (isProperty &&
         (board[currentPlayer.position] as Property).owner != null) {
       Property property = board[currentPlayer.position] as Property;
+      int rent = 0;
       Player owner = property.owner!;
       if (owner != currentPlayer) {
-        currentPlayer.money -= property.rent;
-        owner.money += property.rent;
+        if (property.type == CellType.utility) {
+          rent = (property as Utility)
+              .calculateRent(diceValue: firstDie + secondDie);
+        } else if (property.type == CellType.bikelane) {
+          rent = (property as BikeLane).calculateRent();
+          currentPlayer.payRent(rent);
+          owner.receiveRent(rent);
+        } else {
+          rent = property.calculateRent();
+          currentPlayer.payRent(rent);
+          owner.receiveRent(rent);
+        }
+        currentPlayer.payRent(rent);
+        owner.receiveRent(rent);
         print(
-            "Player ${currentPlayer.name} landed on ${property.name}, paid ${property.rent} to ${owner.name}");
+            "Player ${currentPlayer.name} landed on ${property.name}, paid $rent to ${owner.name}");
         gameEvents.insert(
             0,
             GameEvent(
                 message:
-                    "Player ${currentPlayer.name} landed on ${property.name}, paid ${property.rent} to ${owner.name}",
+                    "Player ${currentPlayer.name} landed on ${property.name}, paid $rent to ${owner.name}",
                 firstPlayer: currentPlayer,
                 secondPlayer: owner,
                 property: property,
-                amount: property.rent,
+                amount: rent,
                 type: EventType.rent));
       }
 

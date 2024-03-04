@@ -38,6 +38,7 @@ class BoardRow extends StatelessWidget {
             CellType.freeParking => null,
             CellType.start => null,
             CellType.property => null,
+            CellType.city => null,
           };
           return GestureDetector(
             onTap: () {
@@ -97,6 +98,7 @@ class BoardColumn extends StatelessWidget {
           CellType.freeParking => null,
           CellType.start => null,
           CellType.property => null,
+          CellType.city => null,
         };
         return GestureDetector(
           onTap: () {

@@ -27,7 +27,7 @@ class AnimatedShadowContainerState extends State<AnimatedShadowContainer>
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 350),
       width: widget.width,
       height: widget.height,
       decoration: BoxDecoration(

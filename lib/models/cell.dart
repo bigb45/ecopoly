@@ -11,6 +11,7 @@ class Cell {
 }
 
 enum CellType {
+  city,
   chance,
   charity,
   property,

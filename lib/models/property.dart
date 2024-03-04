@@ -16,4 +16,8 @@ class Property extends Cell {
       required super.type,
       required super.imageName,
       required this.setIndex});
+
+  int calculateRent({int diceValue = 0}) {
+    return rent;
+  }
 }
