@@ -93,7 +93,6 @@ class BlurryContainer extends StatelessWidget {
                   color: Colors.black.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(cellRadius),
                 ),
-                child: centerChild ?? Container(),
               ),
               if (isProperty && (cell as Property).owner == null)
                 Padding(
@@ -118,6 +117,7 @@ class BlurryContainer extends StatelessWidget {
                     ),
                   ),
                 ),
+              // Property name
               SizedBox(height: height, width: width, child: child),
             ],
           ),
