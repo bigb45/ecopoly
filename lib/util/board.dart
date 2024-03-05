@@ -163,7 +163,7 @@ List<Cell> board = [
     setIndex: 3,
   ),
   Cell(
-      imageName: "assets/images/freeParking.jpg",
+      imageName: "assets/images/free_parking.jpg",
       name: "Free Parking",
       index: 20,
       type: CellType.freeParking),
@@ -230,7 +230,7 @@ List<Cell> board = [
   Utility(
     cost: 150,
     rent: 20,
-    imageName: "assets/images/recycling.jpg",
+    imageName: "assets/images/recycling.png",
     name: "Recycling Plant",
     index: 28,
     setIndex: 9,
@@ -245,7 +245,7 @@ List<Cell> board = [
     setIndex: 5,
   ),
   Cell(
-      imageName: "assets/images/goToJail.png",
+      imageName: "assets/images/go_to_jail.png",
       name: "Go to Jail",
       index: 30,
       type: CellType.goToJail),
@@ -307,7 +307,7 @@ List<Cell> board = [
   ),
   Tax(
     amount: 75,
-    imageName: "assets/images/fixed_tax.jpg",
+    imageName: "assets/images/fixed_tax.png",
     name: "Environmental Tax",
     index: 38,
   ),
