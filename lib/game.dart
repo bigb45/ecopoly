@@ -93,8 +93,8 @@ class _GameScreenState extends State<GameScreen> {
                                       gameManager.openInfoCard(index)))
                               .inGridArea('city3'),
                           jail().inGridArea('jail'),
-                          jail().inGridArea('gotojail'),
-                          jail().inGridArea('parking')
+                          goToJail().inGridArea('gotojail'),
+                          freeParking().inGridArea('parking')
                         ],
                       ),
                     ),
@@ -236,12 +236,46 @@ Widget start() {
   );
 }
 
-Widget jail({GameManager? gameManager}) {
+Widget goToJail() {
   return BlurryContainer(
     width: width,
     height: width,
     blurStrength: 0,
-    cell: board[0],
+    cell: board[30],
+    child: Text(
+      'Go to Jail',
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.white,
+      ),
+      textAlign: TextAlign.center,
+    ),
+  );
+}
+
+Widget freeParking() {
+  return BlurryContainer(
+    width: width,
+    height: width,
+    blurStrength: 0,
+    cell: board[20],
+    child: Text(
+      'Free Parking',
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.white,
+      ),
+      textAlign: TextAlign.center,
+    ),
+  );
+}
+
+Widget jail() {
+  return BlurryContainer(
+    width: width,
+    height: width,
+    blurStrength: 0,
+    cell: board[10],
     child: Text(
       'Jail',
       style: TextStyle(

@@ -7,8 +7,8 @@ import 'package:ecopoly/models/utility.dart';
 
 List<Cell> board = [
   Cell(
-      name: 'Go',
-      imageName: 'assets/images/jail.png',
+      name: 'Start',
+      imageName: 'assets/images/start.png',
       index: 0,
       type: CellType.start),
   Property(
@@ -163,7 +163,7 @@ List<Cell> board = [
     setIndex: 3,
   ),
   Cell(
-      imageName: "assets/images/jail.png",
+      imageName: "assets/images/freeParking.jpg",
       name: "Free Parking",
       index: 20,
       type: CellType.freeParking),
@@ -245,7 +245,7 @@ List<Cell> board = [
     setIndex: 5,
   ),
   Cell(
-      imageName: "assets/images/jail.png",
+      imageName: "assets/images/goToJail.png",
       name: "Go to Jail",
       index: 30,
       type: CellType.goToJail),

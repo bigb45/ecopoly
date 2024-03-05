@@ -70,11 +70,11 @@ class GameManager extends ChangeNotifier {
   }
 
   (int, int) rollDice() {
-    // firstDie = Random().nextInt(6) + 1;
-    // secondDie = Random().nextInt(6) + 1;
+    firstDie = Random().nextInt(6) + 1;
+    secondDie = Random().nextInt(6) + 1;
 
-    firstDie = 4;
-    secondDie = 4;
+    // firstDie = 4;
+    // secondDie = 4;
     int prevPosition = currentPlayer.position;
     if (currentPlayer.isInJail) {
       if (currentPlayer.jailTurns == 3 || firstDie == secondDie) {
