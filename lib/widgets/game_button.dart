@@ -7,8 +7,10 @@ class GameButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String childText;
   final TextStyle? style;
+  final Widget? leading;
   const GameButton({
     Key? key,
+    this.leading,
     this.onPressed,
     this.style,
     required this.childText,
@@ -40,21 +42,45 @@ class GameButton extends StatelessWidget {
         child: InkWell(
           onTap: onPressed != null
               ? () {
-                  print("Button Pressed");
                   onPressed!();
                 }
               : null,
           child: Padding(
             padding:
                 const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Text(childText,
-                style: style == null
-                    ? TextStyle(
-                        color: isActive
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.5),
-                        fontSize: 16)
-                    : style!),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (leading != null)
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: const Offset(0, 0),
+                          )
+                        ],
+                      ),
+                      width: 30,
+                      height: 30,
+                      child: leading!),
+                if (leading != null)
+                  const SizedBox(
+                    width: 20,
+                  ),
+                Text(childText,
+                    style: style == null
+                        ? TextStyle(
+                            color: isActive
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.5),
+                            fontSize: 16)
+                        : style!),
+              ],
+            ),
           ),
         ),
       ),

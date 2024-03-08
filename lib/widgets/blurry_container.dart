@@ -61,20 +61,6 @@ class BlurryContainer extends StatelessWidget {
           width: width,
           height: height,
           isProperty: isProperty,
-          // decoration: BoxDecoration(
-          //   color: Colors.transparent,
-          //   borderRadius: BorderRadius.circular(cellRadius),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: isProperty
-          //           ? (cell as Property).owner?.color ?? Colors.transparent
-          //           : Colors.transparent,
-          //       spreadRadius: 10,
-          //       blurRadius: 10,
-          //       offset: const Offset(0, 0),
-          //     ),
-          //   ],
-          // ),
           child: Stack(
             alignment: Alignment.bottomCenter,
             children: [

@@ -38,11 +38,13 @@ class GameManager extends ChangeNotifier {
       Player(name: '', money: 0, index: -1, color: Colors.blue);
 
   GameManager._init() {
+    print("initializing game manager");
     players = [];
     currentPlayer = Player(name: '', money: 0, index: -1, color: Colors.blue);
   }
 
   void setPlayers(int numberOfPlayers) {
+    print("setting players");
     players = List.generate(
       numberOfPlayers,
       (index) => Player(

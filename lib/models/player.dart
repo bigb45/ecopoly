@@ -9,7 +9,7 @@ import 'package:ecopoly/util/constants.dart';
 class Player {
   static const jailPosition = 10;
 
-  final String name;
+  String name;
   int money;
   List<Property> properties = [];
   int position = 0;
@@ -19,7 +19,7 @@ class Player {
   bool isInJail = false;
   PlayerStatus status = PlayerStatus.playing;
   final int index;
-  final Color color;
+  Color color;
   Player({
     required this.name,
     required this.money,

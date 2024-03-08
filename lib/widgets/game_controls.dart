@@ -68,17 +68,20 @@ class GameControlsState extends State<GameControls> {
       children: [
         GestureDetector(
           onTap: _rollDice,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Dice(
-                value: _firstDieValue,
-                canRoll: !gameManager.rolledDice,
-                playerColor: gameManager.currentPlayer.color),
-            const SizedBox(width: 50),
-            Dice(
-                value: _secondDieValue,
-                canRoll: !gameManager.rolledDice,
-                playerColor: gameManager.currentPlayer.color),
-          ]),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Dice(
+                    value: _firstDieValue,
+                    canRoll: !gameManager.rolledDice,
+                    playerColor: gameManager.currentPlayer.color),
+                const SizedBox(width: 20),
+                Dice(
+                    value: _secondDieValue,
+                    canRoll: !gameManager.rolledDice,
+                    playerColor: gameManager.currentPlayer.color),
+              ]),
         ),
         const SizedBox(height: 20),
         Row(
