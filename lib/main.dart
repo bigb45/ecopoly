@@ -50,6 +50,7 @@ class MainMenuScreen extends StatelessWidget {
     // GameManager gameManager = Provider.of<GameManager>(context);
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
             Positioned.fill(
@@ -62,7 +63,8 @@ class MainMenuScreen extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topLeft,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GameButton(
                       onPressed: () {
