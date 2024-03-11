@@ -9,22 +9,27 @@ import 'package:ecopoly/widgets/player_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ContentWidget extends StatefulWidget {
-  const ContentWidget({
+class Content extends StatefulWidget {
+  const Content({
     Key? key,
   }) : super(key: key);
 
   @override
-  _ContentWidgetState createState() => _ContentWidgetState();
+  _ContentState createState() => _ContentState();
 }
 
-class _ContentWidgetState extends State<ContentWidget> {
+class _ContentState extends State<Content> {
   @override
   Widget build(BuildContext context) {
     return Consumer<GameManager>(builder: (context, gameManager, _) {
       return Container(
-        color: Color(int.parse("0xFF130F2D")),
+        // color: Color(int.parse("0xFF130F2D")),
         // color: Colors.greenAccent,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(begin: Alignment.topLeft, colors: [
+          Color(int.parse("0xFF130F2D")),
+          Color(int.parse("0xFF130F3F"))
+        ])),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

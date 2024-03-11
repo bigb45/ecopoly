@@ -1,10 +1,16 @@
 // ignore_for_file: avoid_print
 
+import 'dart:math';
+
 import 'package:ecopoly/game.dart';
 import 'package:ecopoly/game_logic/game_manager.dart';
+import 'package:ecopoly/game_logic/simulated_game_manager.dart';
+import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/game_button.dart';
 import 'package:ecopoly/widgets/player_model.dart';
 import 'package:ecopoly/widgets/player_number_selector.dart';
+import 'package:ecopoly/widgets/simulated_game_board.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +33,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => GameManager()..setPlayers(2),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'EcoPoly',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -34,7 +41,9 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          '/': (context) => const MainMenuScreen(),
+          '/': (context) => ChangeNotifierProvider(
+              create: (context) => SimulatedGameManager(),
+              child: const MainMenuScreen()),
           '/game': (context) => const GameScreen(),
         },
       ),
@@ -42,12 +51,26 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainMenuScreen extends StatelessWidget {
+class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({super.key});
 
   @override
+  MainMenuScreenState createState() => MainMenuScreenState();
+}
+
+class MainMenuScreenState extends State<MainMenuScreen> {
+  bool _navigationOccurred = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      simulateGame(context);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // GameManager gameManager = Provider.of<GameManager>(context);
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -68,13 +91,16 @@ class MainMenuScreen extends StatelessWidget {
                   children: [
                     GameButton(
                       onPressed: () {
+                        for (var element in board) {
+                          if (element is Property) {
+                            element.owner = null;
+                          }
+                        }
+                        _navigationOccurred = true;
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChangeNotifierProvider(
-                              create: (context) => GameManager()..setPlayers(2),
-                              child: const GameScreen(),
-                            ),
+                            builder: (context) => const GameScreen(),
                           ),
                         );
                       },
@@ -90,9 +116,78 @@ class MainMenuScreen extends StatelessWidget {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: IgnorePointer(
+                  child: SimulatedGameBoard(
+                      gameManager: Provider.of<SimulatedGameManager>(context)),
+                ),
+              ),
+            )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> simulateGame(BuildContext context) async {
+    SimulatedGameManager gameManager =
+        Provider.of<SimulatedGameManager>(context, listen: false);
+    const numberOfIterations = 10;
+    if (_navigationOccurred) {
+      // super.dispose();
+      return;
+    }
+    await startGame(gameManager);
+
+    for (int i = 0; i < numberOfIterations; i++) {
+      if (_navigationOccurred) {
+        // dispose();
+        return;
+      }
+      await rollDice(gameManager);
+      if (gameManager.canBuyProperty) {
+        await buyProperty(gameManager);
+      }
+      await endTurn(gameManager);
+    }
+    return;
+  }
+
+  Future<void> startGame(SimulatedGameManager gameManager) async {
+    print('Starting the game...');
+    await Future.delayed(const Duration(seconds: 3)); // Simulating delay
+    gameManager.startGame();
+  }
+
+  Future<void> rollDice(SimulatedGameManager gameManager) async {
+    // Simulate rolling the dice
+    print('Rolling the dice...');
+    await Future.delayed(
+        Duration(seconds: Random().nextInt(2) + 3)); // Simulating delay
+    if (!_navigationOccurred) {
+      gameManager.rollDice();
+    }
+  }
+
+  Future<void> buyProperty(SimulatedGameManager gameManager) async {
+    // Simulate buying property
+    print('Buying property...');
+    await Future.delayed(const Duration(seconds: 3)); // Simulating delay
+    if (!_navigationOccurred) {
+      gameManager.buyProperty();
+    }
+  }
+
+  Future<void> endTurn(SimulatedGameManager gameManager) async {
+    // Simulate ending the turn
+    print('Ending the turn...');
+    await Future.delayed(
+        Duration(seconds: Random().nextInt(3) + 3)); // Simulating delay
+    if (!_navigationOccurred) {
+      gameManager.endTurn();
+    }
   }
 }
