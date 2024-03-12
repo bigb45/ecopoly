@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/util/audio_manager.dart';
 import 'package:ecopoly/util/board.dart';
+import 'package:ecopoly/widgets/content_widget.dart';
 import 'package:ecopoly/widgets/dice.dart';
 import 'package:ecopoly/widgets/game_button.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +39,7 @@ class GameControlsState extends State<GameControls> {
     final gameManager = Provider.of<GameManager>(context, listen: false);
 
     if (!_isRolling && !gameManager.rolledDice && gameManager.gameStarted) {
+      AudioManager().playAudio(AudioType.diceRoll);
       setState(() {
         _isRolling = true;
       });
@@ -50,7 +53,7 @@ class GameControlsState extends State<GameControls> {
         }
       });
 
-      Timer(const Duration(seconds: 1), () {
+      Timer(const Duration(milliseconds: 1500), () {
         gameManager.rollDice();
         setState(() {
           _firstDieValue = gameManager.firstDie;
@@ -124,10 +127,10 @@ class GameControlsState extends State<GameControls> {
                 onPressed: gameManager.currentPlayer.money >= 0
                     ? () {
                         gameManager.endTurn();
-                        // _showAnimatedDialog(
-                        //     context,
-                        //     gameManager.currentPlayer.name,
-                        //     gameManager.currentPlayer.color);
+                        showAnimatedDialog(
+                            context,
+                            gameManager.currentPlayer.name,
+                            gameManager.currentPlayer.color);
                       }
                     : null,
                 childText: "End turn",

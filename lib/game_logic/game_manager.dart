@@ -4,12 +4,14 @@ import 'dart:math';
 
 import 'package:ecopoly/models/bike_lane.dart';
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/city.dart';
 import 'package:ecopoly/models/game_event.dart';
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/player_status.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/models/utility.dart';
+import 'package:ecopoly/util/audio_manager.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/util/trade.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,7 @@ class GameManager extends ChangeNotifier {
   int doublesCount = 0;
   bool infoCardOpen = false;
   int infoCardIndex = 0;
+
   List<GameEvent> gameEvents = [];
   var firstDie = 1;
   var secondDie = 1;
@@ -75,8 +78,8 @@ class GameManager extends ChangeNotifier {
     firstDie = Random().nextInt(6) + 1;
     secondDie = Random().nextInt(6) + 1;
 
-    // firstDie = 4;
-    // secondDie = 4;
+    // firstDie = 1;
+    // secondDie = 1;
     int prevPosition = currentPlayer.position;
     if (currentPlayer.isInJail) {
       if (currentPlayer.jailTurns == 3 || firstDie == secondDie) {
@@ -89,7 +92,7 @@ class GameManager extends ChangeNotifier {
               "player ${currentPlayer.name} rolled a $firstDie and $secondDie");
           updatePosition(firstDie + secondDie);
         }
-        print("player ${currentPlayer.name} spent 3 turns in jail and got out");
+
         endTurn();
         notifyListeners();
       } else {
@@ -115,9 +118,19 @@ class GameManager extends ChangeNotifier {
       if (doublesCount == doublesLimit) {
         rolledDice = true;
         doublesCount = 0;
-        sendToJail();
         print(
             "Player ${currentPlayer.name} rolled doubles 3 times in a row, go to jail");
+        sendToJail();
+        gameEvents.insert(
+            0,
+            GameEvent(
+                message: "",
+                firstPlayer: currentPlayer,
+                secondPlayer: null,
+                amount: null,
+                property: null,
+                type: EventType.doublesJail));
+        return (firstDie, secondDie);
       }
       CellType cellType = board[currentPlayer.position].type;
       _handleNewPlayerPosition(cellType, prevPosition);
@@ -128,6 +141,7 @@ class GameManager extends ChangeNotifier {
 
   void getOutOfJail() {
     currentPlayer.money -= 50;
+    AudioManager().playAudio(AudioType.payment);
     print("player ${currentPlayer.name} paid 50 to get out of jail");
     currentPlayer.isInJail = false;
     currentPlayer.jailTurns = 0;
@@ -135,6 +149,7 @@ class GameManager extends ChangeNotifier {
   }
 
   void sendToJail() {
+    AudioManager().playAudio(AudioType.sendToJail);
     currentPlayer.goToJail();
     canBuyProperty = false;
     endTurn();
@@ -142,6 +157,7 @@ class GameManager extends ChangeNotifier {
 
   void _handleNewPlayerPosition(CellType cellType, int prevPosition) {
     final isProperty = (cellType == CellType.property ||
+        cellType == CellType.city ||
         cellType == CellType.utility ||
         cellType == CellType.bikelane);
 
@@ -160,6 +176,7 @@ class GameManager extends ChangeNotifier {
         currentPlayer.position != 0 &&
         !currentPlayer.isInJail) {
       currentPlayer.money += 200;
+      AudioManager().playAudio(AudioType.passGo);
       gameEvents.insert(
         0,
         GameEvent(
@@ -181,6 +198,7 @@ class GameManager extends ChangeNotifier {
                   currentPlayer.money)
               .round();
       currentPlayer.money -= tax;
+      AudioManager().playAudio(AudioType.payment);
       gameEvents.insert(
           0,
           GameEvent(
@@ -214,6 +232,7 @@ class GameManager extends ChangeNotifier {
           owner.receiveRent(rent);
         }
         currentPlayer.payRent(rent);
+        AudioManager().playAudio(AudioType.payment);
         owner.receiveRent(rent);
         print(
             "Player ${currentPlayer.name} landed on ${property.name}, paid $rent to ${owner.name}");
@@ -253,6 +272,7 @@ class GameManager extends ChangeNotifier {
     // if the player lands on go
     if (cellType == CellType.start) {
       currentPlayer.money += 300;
+      AudioManager().playAudio(AudioType.passGo);
       print("Player ${currentPlayer.name} landed on go, received 300");
       gameEvents.insert(
           0,
@@ -314,6 +334,7 @@ class GameManager extends ChangeNotifier {
   }
 
   GameCard drawCharityCard() {
+    AudioManager().playAudio(AudioType.cardDraw);
     int charityCardIndex = Random().nextInt(chanceCards.length);
     print(
         "Player ${currentPlayer.name} drew a chance card, ${chanceCards[charityCardIndex].description}");
@@ -321,6 +342,8 @@ class GameManager extends ChangeNotifier {
   }
 
   GameCard drawSurpriseCard() {
+    AudioManager().playAudio(AudioType.cardDraw);
+
     int surpriseCardIndex = Random().nextInt(surpriseCards.length);
     print(
         "Player ${currentPlayer.name} drew a chance card, ${surpriseCards[surpriseCardIndex].description}");
@@ -342,14 +365,14 @@ class GameManager extends ChangeNotifier {
   }
 
   void buyProperty() {
+    AudioManager().playAudio(AudioType.purchase);
+
     Property property = board[currentPlayer.position] as Property;
 
     canBuyProperty = false;
 
     currentPlayer.buyProperty(property);
 
-    print(
-        "Player ${currentPlayer.name} bought ${board[currentPlayer.position].name}");
     gameEvents.insert(
         0,
         GameEvent(
@@ -363,17 +386,20 @@ class GameManager extends ChangeNotifier {
   }
 
   void sellProperty(Property property) {
-    currentPlayer.sellProperty(property);
-    gameEvents.insert(
-        0,
-        GameEvent(
-            message: "",
-            firstPlayer: currentPlayer,
-            secondPlayer: null,
-            amount: null,
-            property: property,
-            type: EventType.sell));
-    notifyListeners();
+    if (property.trees == 0) {
+      currentPlayer.sellProperty(property);
+      AudioManager().playAudio(AudioType.sellProperty);
+      gameEvents.insert(
+          0,
+          GameEvent(
+              message: "",
+              firstPlayer: currentPlayer,
+              secondPlayer: null,
+              amount: null,
+              property: property,
+              type: EventType.sell));
+      notifyListeners();
+    }
   }
 
   void endTurn() {
@@ -413,6 +439,24 @@ class GameManager extends ChangeNotifier {
 
   void updatePosition(steps) {
     currentPlayer.movePlayer(steps: steps);
+
+    notifyListeners();
+  }
+
+  void plantTree(City city) {
+    if (currentPlayer.money > city.treeCost) {
+      print("Player ${currentPlayer.name} planted a tree in ${city.name}");
+      currentPlayer.plantTree(city);
+      AudioManager().playAudio(AudioType.plantTree);
+      notifyListeners();
+    }
+  }
+
+  void destroyTree(City city) {
+    if (city.trees > 0) {
+      AudioManager().playAudio(AudioType.removeTree);
+      currentPlayer.destroyTree(city);
+    }
 
     notifyListeners();
   }

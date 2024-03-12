@@ -1,5 +1,6 @@
 import 'package:ecopoly/models/bike_lane.dart';
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/city.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/models/card.dart';
@@ -11,13 +12,13 @@ List<Cell> board = [
       imageName: 'assets/images/start.png',
       index: 0,
       type: CellType.start),
-  Property(
+  City(
     imageName: "assets/images/spain.png",
     name: "Madrid",
     index: 1,
     cost: 60,
     rent: 2,
-    type: CellType.property,
+    treeCost: 50,
     setIndex: 0,
   ),
   Cell(
@@ -25,13 +26,13 @@ List<Cell> board = [
       name: "Surprise",
       index: 2,
       type: CellType.chance),
-  Property(
+  City(
     cost: 60,
     rent: 4,
     imageName: "assets/images/spain.png",
     name: "Barcelona",
     index: 3,
-    type: CellType.property,
+    treeCost: 50,
     setIndex: 0,
   ),
   Tax(
@@ -47,36 +48,36 @@ List<Cell> board = [
     index: 5,
     setIndex: 8,
   ),
-  Property(
+  City(
     cost: 120,
     rent: 6,
     imageName: "assets/images/india.png",
     name: "Mumbai",
     index: 6,
-    type: CellType.property,
+    treeCost: 50,
     setIndex: 1,
   ),
   Cell(
-      imageName: "assets/images/community_chest.jpg",
+      imageName: "assets/images/charity.png",
       name: "Charity",
       index: 7,
       type: CellType.charity),
-  Property(
+  City(
     cost: 100,
     rent: 6,
     imageName: "assets/images/india.png",
     name: "Delhi",
     index: 8,
-    type: CellType.property,
+    treeCost: 50,
     setIndex: 1,
   ),
-  Property(
+  City(
     cost: 100,
     rent: 6,
     imageName: "assets/images/india.png",
     name: "Bangalore",
     index: 9,
-    type: CellType.property,
+    treeCost: 50,
     setIndex: 1,
   ),
   Cell(
@@ -86,13 +87,13 @@ List<Cell> board = [
       type: CellType.jail),
 
   // Second row
-  Property(
+  City(
     cost: 140,
     rent: 10,
     imageName: "assets/images/turkey.png",
     name: "Istanbul",
     index: 11,
-    type: CellType.property,
+    treeCost: 100,
     setIndex: 2,
   ),
   Utility(
@@ -104,22 +105,22 @@ List<Cell> board = [
     setIndex: 9,
   ),
 
-  Property(
+  City(
     cost: 160,
     rent: 12,
     imageName: "assets/images/turkey.png",
     name: "Ankara",
     index: 13,
-    type: CellType.property,
+    treeCost: 100,
     setIndex: 2,
   ),
-  Property(
+  City(
     cost: 140,
     rent: 10,
     imageName: "assets/images/turkey.png",
     name: "Izmir",
     index: 14,
-    type: CellType.property,
+    treeCost: 100,
     setIndex: 2,
   ),
   BikeLane(
@@ -130,36 +131,36 @@ List<Cell> board = [
     index: 15,
     setIndex: 8,
   ),
-  Property(
+  City(
     cost: 200,
     rent: 20,
     imageName: "assets/images/sweden.png",
     name: "Stockholm",
     index: 16,
-    type: CellType.property,
+    treeCost: 100,
     setIndex: 3,
   ),
   Cell(
-      imageName: "assets/images/community_chest.jpg",
+      imageName: "assets/images/charity.png",
       name: "Charity",
       index: 17,
       type: CellType.charity),
-  Property(
+  City(
     cost: 180,
     rent: 14,
     imageName: "assets/images/sweden.png",
     name: "Gothenburg",
     index: 18,
-    type: CellType.property,
+    treeCost: 100,
     setIndex: 3,
   ),
-  Property(
+  City(
     cost: 180,
     rent: 14,
     imageName: "assets/images/sweden.png",
     name: "Malmo",
     index: 19,
-    type: CellType.property,
+    treeCost: 100,
     setIndex: 3,
   ),
   Cell(
@@ -169,13 +170,13 @@ List<Cell> board = [
       type: CellType.freeParking),
 
   // Third row
-  Property(
+  City(
     cost: 240,
     rent: 20,
     imageName: "assets/images/australia.png",
     name: "Sydney",
     index: 21,
-    type: CellType.property,
+    treeCost: 150,
     setIndex: 4,
   ),
   Cell(
@@ -183,22 +184,22 @@ List<Cell> board = [
       name: "Surprise",
       index: 22,
       type: CellType.chance),
-  Property(
+  City(
     cost: 220,
     rent: 18,
     imageName: "assets/images/australia.png",
     name: "Melbourne",
     index: 23,
-    type: CellType.property,
+    treeCost: 150,
     setIndex: 4,
   ),
-  Property(
+  City(
     cost: 220,
     rent: 18,
     imageName: "assets/images/australia.png",
     name: "Brisbane",
     index: 24,
-    type: CellType.property,
+    treeCost: 150,
     setIndex: 4,
   ),
   BikeLane(
@@ -209,22 +210,22 @@ List<Cell> board = [
     index: 25,
     setIndex: 8,
   ),
-  Property(
+  City(
     cost: 280,
     rent: 24,
     imageName: "assets/images/canada.png",
     name: "Toronto",
     index: 26,
-    type: CellType.property,
+    treeCost: 160,
     setIndex: 5,
   ),
-  Property(
+  City(
     cost: 260,
     rent: 24,
     imageName: "assets/images/canada.png",
     name: "Montreal",
     index: 27,
-    type: CellType.property,
+    treeCost: 160,
     setIndex: 5,
   ),
   Utility(
@@ -235,13 +236,13 @@ List<Cell> board = [
     index: 28,
     setIndex: 9,
   ),
-  Property(
+  City(
     cost: 240,
     rent: 22,
     imageName: "assets/images/canada.png",
     name: "Vancouver",
     index: 29,
-    type: CellType.property,
+    treeCost: 160,
     setIndex: 5,
   ),
   Cell(
@@ -251,13 +252,13 @@ List<Cell> board = [
       type: CellType.goToJail),
 
   // Fourth row
-  Property(
+  City(
     cost: 300,
     rent: 26,
     imageName: "assets/images/usa.png",
     name: "New York",
     index: 31,
-    type: CellType.property,
+    treeCost: 180,
     setIndex: 6,
   ),
   Cell(
@@ -265,22 +266,22 @@ List<Cell> board = [
       name: "Surprise",
       index: 32,
       type: CellType.chance),
-  Property(
+  City(
     cost: 300,
     rent: 26,
     imageName: "assets/images/usa.png",
     name: "Los Angeles",
     index: 33,
-    type: CellType.property,
+    treeCost: 180,
     setIndex: 6,
   ),
-  Property(
+  City(
     cost: 320,
     rent: 28,
     imageName: "assets/images/usa.png",
     name: "Washington DC",
     index: 34,
-    type: CellType.property,
+    treeCost: 180,
     setIndex: 6,
   ),
   BikeLane(
@@ -292,17 +293,17 @@ List<Cell> board = [
     setIndex: 8,
   ),
   Cell(
-      imageName: "assets/images/community_chest.jpg",
+      imageName: "assets/images/charity.png",
       name: "Charity",
       index: 36,
       type: CellType.charity),
-  Property(
+  City(
     cost: 350,
     rent: 35,
     imageName: "assets/images/japan.png",
     name: "Tokyo",
     index: 37,
-    type: CellType.property,
+    treeCost: 200,
     setIndex: 7,
   ),
   Tax(
@@ -311,13 +312,13 @@ List<Cell> board = [
     name: "Environmental Tax",
     index: 38,
   ),
-  Property(
+  City(
     cost: 400,
     rent: 50,
     imageName: "assets/images/japan.png",
     name: "Osaka",
     index: 39,
-    type: CellType.property,
+    treeCost: 200,
     setIndex: 7,
   ),
 ];

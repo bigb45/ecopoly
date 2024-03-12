@@ -5,8 +5,8 @@ class Property extends Cell {
   final int cost;
   final int rent;
   final int setIndex;
-  final int trees = 0;
-  final int forest = 0;
+  int trees = 0;
+  int forest = 0;
   Player? owner;
   Property(
       {required this.cost,

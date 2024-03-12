@@ -1,15 +1,21 @@
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/util/board.dart';
+import 'package:ecopoly/util/constants.dart';
 
 class City extends Property {
-  City(
-      {required int cost,
-      required int rent,
-      required String name,
-      required int index,
-      required String imageName,
-      required int setIndex})
-      : super(
+  bool canPlantTree = false;
+  bool canDestroyTree = false;
+  int treeCost;
+  City({
+    required int cost,
+    required int rent,
+    required String name,
+    required int index,
+    required String imageName,
+    required int setIndex,
+    required this.treeCost,
+  }) : super(
             cost: cost,
             rent: rent,
             name: name,
@@ -23,16 +29,16 @@ class City extends Property {
     int totalRent;
     switch (trees) {
       case 1:
-        totalRent = rent;
+        totalRent = rent * rentMultiplier;
         break;
       case 2:
-        totalRent = rent * 2;
+        totalRent = rent * 3 * rentMultiplier;
         break;
       case 3:
-        totalRent = rent * 3;
+        totalRent = rent * 6 * rentMultiplier;
         break;
       case 4:
-        totalRent = rent * 4;
+        totalRent = rent * 10 * rentMultiplier;
         break;
 
       default:
@@ -40,4 +46,9 @@ class City extends Property {
     }
     return totalRent;
   }
+}
+
+List<Property> getSetProperties(int setIndex) {
+  List<Property> properties = board.whereType<Property>().toList();
+  return properties.where((property) => property.setIndex == setIndex).toList();
 }

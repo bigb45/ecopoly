@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:ecopoly/game.dart';
+import 'package:ecopoly/models/city.dart';
 import 'package:ecopoly/models/player_status.dart';
 import 'package:ecopoly/models/property.dart';
+import 'package:ecopoly/util/audio_manager.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/util/constants.dart';
 
@@ -90,5 +92,33 @@ class Player {
   void goToJail() {
     position = jailPosition;
     isInJail = true;
+  }
+
+  void plantTree(City city) {
+    if (playerOwnsSet(city.setIndex) && city.trees < maxTrees) {
+      city.trees++;
+      money -= city.treeCost;
+      print("player $name planted a tree in ${city.name} for ${city.treeCost}");
+    }
+  }
+
+  void destroyTree(City city) {
+    if (city.trees > 0) {
+      city.trees--;
+      money += city.treeCost ~/ 2;
+    }
+  }
+
+  bool ownsProperty(Property property) {
+    if (property.owner == this) {
+      return true;
+    }
+    return false;
+  }
+
+  bool playerOwnsSet(int setIndex) {
+    List<Property> propertiesInSet = getSetProperties(setIndex);
+
+    return propertiesInSet.every((property) => ownsProperty(property));
   }
 }

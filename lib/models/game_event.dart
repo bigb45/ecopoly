@@ -18,6 +18,7 @@ class GameEvent {
 }
 
 enum EventType {
+  doublesJail,
   offerTrade,
   acceptTrade,
   purchase,

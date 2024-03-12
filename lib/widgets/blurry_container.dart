@@ -1,4 +1,5 @@
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/city.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/widgets/animated_shadow_container.dart';
 import 'package:flutter/material.dart';
@@ -27,22 +28,21 @@ class BlurryContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isProperty = cell.type == CellType.property ||
+        cell.type == CellType.city ||
         cell.type == CellType.bikelane ||
         cell.type == CellType.utility;
 
     return Container(
       // shadow of the whole cell
-      decoration: BoxDecoration(
-          // borderRadius: BorderRadius.circular(cellRadius),
-          color: Color(int.parse("0xFF130F2D")),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 0),
-            ),
-          ]),
+      decoration:
+          BoxDecoration(color: Color(int.parse("0xFF130F2D")), boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.5),
+          spreadRadius: 2,
+          blurRadius: 5,
+          offset: const Offset(0, 0),
+        ),
+      ]),
       child: ClipPath(
         clipper: CustomRoundedClipper(
           borderRadius: cellRadius,
@@ -97,14 +97,33 @@ class BlurryContainer extends StatelessWidget {
                         child: Text(
                           "\$${(cell as Property).cost}",
                           style: const TextStyle(
-                              color: Colors.white, fontSize: 11),
+                              color: Colors.white, fontSize: 16),
                         ),
                       ),
                     ),
                   ),
                 ),
+
               // Property name
               SizedBox(height: height, width: width, child: child),
+              if (cell.type == CellType.city && (cell as City).trees > 0)
+                Positioned(
+                  bottom: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      " ${(cell as City).trees}X🌳",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

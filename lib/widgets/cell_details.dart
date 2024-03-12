@@ -2,22 +2,24 @@
 
 import 'dart:ui';
 
+import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/cell.dart';
+import 'package:ecopoly/models/city.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/util/board.dart';
+import 'package:ecopoly/util/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CellDetails extends StatelessWidget {
   final int cardIndex;
   final int currentPlayerIndex;
   final VoidCallback onClose;
-  final Function(Property) onSell;
   const CellDetails(
       {super.key,
       required this.cardIndex,
       required this.onClose,
-      required this.onSell,
       required this.currentPlayerIndex});
 
   @override
@@ -120,9 +122,7 @@ class CellDetails extends StatelessWidget {
             ),
           if (cell is Property &&
               (cell.type != CellType.bikelane && cell.type != CellType.utility))
-            propertyInfo(cell,
-                currentPlayerIndex: currentPlayerIndex,
-                onSell: (Property cell) => onSell(cell)),
+            PropertyInfo(currentPlayerIndex: currentPlayerIndex, cell: cell),
           if (cell is Tax) taxInfo(cell),
           if (cell.type == CellType.utility) utilityInfo(cell as Property),
           if (cell.type == CellType.bikelane) bikeInfo(cell as Property)
@@ -313,70 +313,81 @@ Widget taxInfo(Tax cell) {
   );
 }
 
-Widget propertyInfo(Property cell,
-    {required int currentPlayerIndex,
-    required Function(Property property) onSell}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            cell.name,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+class PropertyInfo extends StatelessWidget {
+  final int currentPlayerIndex;
+  final Property cell;
+  const PropertyInfo(
+      {super.key, required this.currentPlayerIndex, required this.cell});
+
+  @override
+  Widget build(BuildContext context) {
+    final GameManager gameManager =
+        Provider.of<GameManager>(context, listen: false);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              cell.name,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-          ),
-          Text(
-            cell.type.name.toUpperCase(),
-            style: const TextStyle(fontSize: 14, color: Colors.white),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: (cell).owner?.color ?? Colors.grey.shade900,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 2.0, horizontal: 6.0),
-                    child: Text(
-                      cell.owner?.name ?? "Not owned",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
+            Text(
+              cell.type.name.toUpperCase(),
+              style: const TextStyle(fontSize: 14, color: Colors.white),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (cell).owner?.color ?? Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2.0, horizontal: 6.0),
+                      child: Text(
+                        cell.owner?.name ?? "Not owned",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              if (cell.owner != null && cell.owner!.index == currentPlayerIndex)
-                ...propertyManagement(
-                  onBuild: () {
-                    print("Build");
-                  },
-                  onDestroy: () {
-                    print("Destroy");
-                  },
-                  onSell: () {
-                    print("player index $currentPlayerIndex sold ${cell.name}");
-                    onSell(cell);
-                  },
-                )
-            ],
-          ),
-          rent(basePrice: (cell).cost, rent: cell.rent, multiplier: 4),
-        ],
+                if (cell.owner != null &&
+                    cell.owner!.index == currentPlayerIndex)
+                  ...propertyManagement(
+                    onBuild: () {
+                      gameManager.plantTree(cell as City);
+                      print("Build");
+                    },
+                    onDestroy: () {
+                      gameManager.destroyTree(cell as City);
+                      print("Destroy");
+                    },
+                    onSell: () {
+                      gameManager.sellProperty(cell);
+                    },
+                  )
+              ],
+            ),
+            rent(basePrice: (cell).cost, rent: cell.rent),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 List<Widget> propertyManagement(
@@ -451,28 +462,12 @@ List<Widget> propertyManagement(
   ];
 }
 
-Widget rent(
-    {required int basePrice, required int rent, required double multiplier}) {
+Widget rent({required int basePrice, required int rent}) {
   return Column(children: [
-    rentRow(
-      rent,
-      multiplier,
-      1,
-    ),
-    rentRow(rent, multiplier * 3, 2),
-    rentRow(rent, multiplier * 4, 3),
-    rentRow(rent, multiplier * 5, 4),
-    Row(
-      children: [
-        const Text(
-          "with Forest",
-          style: TextStyle(fontSize: 14, color: Colors.white),
-        ),
-        const Spacer(),
-        Text("\$${(rent * multiplier * 7).round()}",
-            style: const TextStyle(fontSize: 14, color: Colors.white))
-      ],
-    ),
+    rentRow(rent, rentMultiplier, 1),
+    rentRow(rent, rentMultiplier * 3, 2),
+    rentRow(rent, rentMultiplier * 6, 3),
+    rentRow(rent, rentMultiplier * 10, 4),
     Text(
       "Sell Value \$${(basePrice * 0.8).round()}",
       style: const TextStyle(

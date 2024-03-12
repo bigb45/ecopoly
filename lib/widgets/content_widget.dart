@@ -41,8 +41,6 @@ class _ContentState extends State<Content> {
                 child: CellDetails(
                   cardIndex: gameManager.infoCardIndex,
                   currentPlayerIndex: gameManager.currentPlayer.index,
-                  onSell: (Property property) =>
-                      gameManager.sellProperty(property),
                   onClose: () {
                     gameManager.closeInfoCard();
                   },
@@ -81,7 +79,10 @@ class _ContentState extends State<Content> {
                                 opacity: index == 0
                                     ? 1.0
                                     : 0.5, // Adjust opacity as needed
-                                child: getMessageFromEvent(event),
+                                child: DefaultTextStyle(
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 20),
+                                    child: getMessageFromEvent(event)),
                               ),
                             );
                           }).toList(),
@@ -101,6 +102,22 @@ class _ContentState extends State<Content> {
 
 Widget getMessageFromEvent(GameEvent event) {
   switch (event.type) {
+    case EventType.doublesJail:
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          playerInText(event.firstPlayer),
+          const Flexible(
+            fit: FlexFit.loose,
+            child: Text(
+              " rolled doubles 3 times in a row and went to jail.",
+              softWrap: true,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      );
     case EventType.offerTrade:
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -108,12 +125,10 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           const Text(
             " offered ",
-            style: TextStyle(color: Colors.white),
           ),
           playerInText(event.secondPlayer!),
           const Text(
             " A trade.",
-            style: TextStyle(color: Colors.white),
           )
         ],
       );
@@ -126,7 +141,6 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           const Text(
             " bought ",
-            style: TextStyle(color: Colors.white),
           ),
           propertyInText(event.property!),
         ],
@@ -139,11 +153,9 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           Text(
             " paid \$${event.amount ?? 200} ",
-            style: const TextStyle(color: Colors.white),
           ),
           const Text(
             " to ",
-            style: TextStyle(color: Colors.white),
           ),
           playerInText(event.secondPlayer!),
         ],
@@ -155,7 +167,6 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           Text(
             " paid \$${event.amount} in tax",
-            style: const TextStyle(color: Colors.white),
           ),
         ],
       );
@@ -166,19 +177,6 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           const Text(
             " landed on Go To Jail ",
-            style: TextStyle(color: Colors.white),
-          ),
-        ],
-      );
-
-    case EventType.tax:
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          playerInText(event.firstPlayer),
-          Text(
-            " paid a tax of \$${event.amount!} ",
-            style: const TextStyle(color: Colors.white),
           ),
         ],
       );
@@ -190,7 +188,6 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           const Text(
             " landed on Start and received \$300 ",
-            style: TextStyle(color: Colors.white),
           ),
         ],
       );
@@ -202,14 +199,12 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           const Text(
             " passed Start and received \$200 ",
-            style: TextStyle(color: Colors.white),
           ),
         ],
       );
     case EventType.gameStart:
       return const Text(
         'The game has started',
-        style: TextStyle(color: Colors.white),
       );
     case EventType.surprise:
       return Row(
@@ -221,7 +216,6 @@ Widget getMessageFromEvent(GameEvent event) {
             fit: FlexFit.loose,
             child: Text(
               " received a surprise card: ${event.message!}",
-              style: const TextStyle(color: Colors.white),
               softWrap: true,
               textAlign: TextAlign.center,
             ),
@@ -238,7 +232,6 @@ Widget getMessageFromEvent(GameEvent event) {
             fit: FlexFit.loose,
             child: Text(
               " received a charity card: ${event.message!} ",
-              style: const TextStyle(color: Colors.white),
               softWrap: true,
               textAlign: TextAlign.center,
             ),
@@ -253,7 +246,6 @@ Widget getMessageFromEvent(GameEvent event) {
           playerInText(event.firstPlayer),
           const Text(
             " sold ",
-            style: TextStyle(color: Colors.white),
           ),
           propertyInText(event.property!),
         ],
@@ -303,7 +295,7 @@ Widget playerInText(Player player) {
   );
 }
 
-void _showAnimatedDialog(
+void showAnimatedDialog(
     BuildContext context, String playerName, Color playerColor) {
   Timer? timer = Timer(const Duration(milliseconds: 3000), () {
     Navigator.of(context, rootNavigator: true).pop();

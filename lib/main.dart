@@ -137,7 +137,6 @@ class MainMenuScreenState extends State<MainMenuScreen> {
         Provider.of<SimulatedGameManager>(context, listen: false);
     const numberOfIterations = 10;
     if (_navigationOccurred) {
-      // super.dispose();
       return;
     }
     await startGame(gameManager);
@@ -159,7 +158,9 @@ class MainMenuScreenState extends State<MainMenuScreen> {
   Future<void> startGame(SimulatedGameManager gameManager) async {
     print('Starting the game...');
     await Future.delayed(const Duration(seconds: 3)); // Simulating delay
-    gameManager.startGame();
+    if (!_navigationOccurred) {
+      gameManager.startGame();
+    }
   }
 
   Future<void> rollDice(SimulatedGameManager gameManager) async {
