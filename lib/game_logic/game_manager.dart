@@ -59,6 +59,7 @@ class GameManager extends ChangeNotifier {
   }
 
   void startGame() {
+    AudioManager().playAudio(AudioType.startGame);
     gameEvents.insert(
         0,
         GameEvent(

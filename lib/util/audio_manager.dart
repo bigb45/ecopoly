@@ -25,7 +25,6 @@ class AudioManager {
       final audioPath = _getAudioPath(audio);
       final audioAsset = AudioCache();
       await audioAsset.load("audio/$audioPath");
-      print("audio/$audioPath");
       await _audioPlayer.play(AssetSource("audio/$audioPath"));
     } catch (e) {
       print('Error playing audio: $e');
@@ -50,8 +49,7 @@ class AudioManager {
         return "pay.wav";
       case AudioType.diceRoll:
         return "dice_roll.wav";
-      case AudioType.gameStart:
-        return "";
+
       case AudioType.sendToJail:
         return "go_to_jail.wav";
       case AudioType.cardDraw:
@@ -64,6 +62,8 @@ class AudioManager {
         return "plant_tree.wav";
       case AudioType.removeTree:
         return "remove_tree.wav";
+      case AudioType.startGame:
+        return "game_start.wav";
     }
   }
 }
@@ -72,11 +72,11 @@ enum AudioType {
   payment,
   purchase,
   diceRoll,
-  gameStart,
   sendToJail,
   cardDraw,
   passGo,
   sellProperty,
   plantTree,
   removeTree,
+  startGame,
 }
