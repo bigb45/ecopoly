@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:ecopoly/game.dart';
 import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/game_logic/simulated_game_manager.dart';
+import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/game_button.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => GameManager()..setPlayers(2),
+      create: (context) => GameManager(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'EcoPoly',
@@ -42,8 +43,15 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => ChangeNotifierProvider(
-              create: (context) => SimulatedGameManager(),
-              child: const MainMenuScreen()),
+                create: (context) => SimulatedGameManager(),
+                child: MainMenuScreen(
+                  onPlayersSelected: (players) {
+                    print('Player count: ${players.length}');
+                    Provider.of<GameManager>(context, listen: false)
+                        .setPlayers(players);
+                  },
+                ),
+              ),
           '/game': (context) => const GameScreen(),
         },
       ),
@@ -52,7 +60,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MainMenuScreen extends StatefulWidget {
-  const MainMenuScreen({super.key});
+  final Function(List<Player>) onPlayersSelected;
+  const MainMenuScreen({super.key, required this.onPlayersSelected});
 
   @override
   MainMenuScreenState createState() => MainMenuScreenState();
@@ -109,8 +118,8 @@ class MainMenuScreenState extends State<MainMenuScreen> {
                       childText: 'Start Game',
                     ),
                     const SizedBox(height: 20),
-                    PlayerNumberSelector(onPlayerNumberChange: (playerCount) {
-                      print("player count: $playerCount");
+                    PlayerNumberSelector(onPlayersChange: (players) {
+                      widget.onPlayersSelected(players);
                     }),
                   ],
                 ),

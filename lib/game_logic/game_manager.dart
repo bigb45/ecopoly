@@ -46,15 +46,15 @@ class GameManager extends ChangeNotifier {
     currentPlayer = Player(name: '', money: 0, index: -1, color: Colors.blue);
   }
 
-  void setPlayers(int numberOfPlayers) {
+  void setPlayers(List<Player> initialPlayers) {
     print("setting players");
     players = List.generate(
-      numberOfPlayers,
+      initialPlayers.length,
       (index) => Player(
-          name: 'Player ${index + 1}',
+          name: initialPlayers[index].name,
           money: startingMoney,
           index: index,
-          color: Colors.primaries[3 * index % Colors.primaries.length]),
+          color: initialPlayers[index].color),
     );
   }
 

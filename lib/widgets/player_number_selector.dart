@@ -8,8 +8,8 @@ import 'package:ecopoly/widgets/player_model.dart';
 const maxPlayers = 4;
 
 class PlayerNumberSelector extends StatefulWidget {
-  final Function(int) onPlayerNumberChange;
-  const PlayerNumberSelector({Key? key, required this.onPlayerNumberChange})
+  final Function(List<Player>) onPlayersChange;
+  const PlayerNumberSelector({Key? key, required this.onPlayersChange})
       : super(key: key);
 
   @override
@@ -23,6 +23,13 @@ class _PlayerNumberSelectorState extends State<PlayerNumberSelector> {
     Player(name: 'Player 2', color: Colors.blue, money: 1000, index: 0),
   ];
   double containerWidth = 150;
+
+  @override
+  void initState() {
+    widget.onPlayersChange(players);
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +120,7 @@ class _PlayerNumberSelectorState extends State<PlayerNumberSelector> {
                           money: 1000,
                           index: playerCount - 1));
 
-                      widget.onPlayerNumberChange(playerCount);
+                      widget.onPlayersChange(players);
                     });
                   }
                 : null,
@@ -164,7 +171,7 @@ class _PlayerNumberSelectorState extends State<PlayerNumberSelector> {
                     playerCount--;
                     // containerWidth -= 40.0;
                     players.removeAt(playerIndex);
-                    widget.onPlayerNumberChange(playerCount);
+                    widget.onPlayersChange(players);
                   });
                   Navigator.pop(context); // Close the dialog
                 },
