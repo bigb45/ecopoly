@@ -9,7 +9,6 @@ import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/widgets/game_button.dart';
-import 'package:ecopoly/widgets/player_model.dart';
 import 'package:ecopoly/widgets/player_number_selector.dart';
 import 'package:ecopoly/widgets/simulated_game_board.dart';
 import 'package:flutter/material.dart';

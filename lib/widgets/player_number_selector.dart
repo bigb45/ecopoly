@@ -1,6 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, avoid_print
 import 'package:flutter/material.dart';
-import 'package:scidart/numdart.dart';
 
 import 'package:ecopoly/models/player.dart';
 import 'package:ecopoly/widgets/player_model.dart';

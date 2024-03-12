@@ -4,7 +4,6 @@ import 'package:ecopoly/game.dart';
 import 'package:ecopoly/models/city.dart';
 import 'package:ecopoly/models/player_status.dart';
 import 'package:ecopoly/models/property.dart';
-import 'package:ecopoly/util/audio_manager.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/util/constants.dart';
 
@@ -98,7 +97,6 @@ class Player {
     if (playerOwnsSet(city.setIndex) && city.trees < maxTrees) {
       city.trees++;
       money -= city.treeCost;
-      print("player $name planted a tree in ${city.name} for ${city.treeCost}");
     }
   }
 

@@ -1,7 +1,6 @@
 import 'package:ecopoly/animations/animated_scale_fade.dart';
 import 'package:ecopoly/board_cells.dart';
 import 'package:ecopoly/game.dart';
-import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/game_logic/simulated_game_manager.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/util/player_position.dart';

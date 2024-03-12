@@ -1,7 +1,6 @@
 import 'package:ecopoly/models/bike_lane.dart';
 import 'package:ecopoly/models/cell.dart';
 import 'package:ecopoly/models/city.dart';
-import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/models/tax.dart';
 import 'package:ecopoly/models/card.dart';
 import 'package:ecopoly/models/utility.dart';
