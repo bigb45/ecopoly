@@ -5,7 +5,7 @@ import 'package:ecopoly/game_logic/game_manager.dart';
 import 'package:ecopoly/models/property.dart';
 import 'package:ecopoly/util/audio_manager.dart';
 import 'package:ecopoly/util/board.dart';
-import 'package:ecopoly/widgets/content_widget.dart';
+import 'package:ecopoly/widgets/content.dart';
 import 'package:ecopoly/widgets/dice.dart';
 import 'package:ecopoly/widgets/game_button.dart';
 import 'package:flutter/material.dart';

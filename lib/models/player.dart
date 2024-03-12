@@ -44,6 +44,7 @@ class Player {
     status = PlayerStatus.bankrupt;
     for (var property in properties) {
       property.owner = null;
+      property.trees = 0;
     }
     properties = [];
   }

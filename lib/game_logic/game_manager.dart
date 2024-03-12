@@ -32,6 +32,7 @@ class GameManager extends ChangeNotifier {
   int doublesCount = 0;
   bool infoCardOpen = false;
   int infoCardIndex = 0;
+  Player? winner;
 
   List<GameEvent> gameEvents = [];
   var firstDie = 1;
@@ -80,7 +81,7 @@ class GameManager extends ChangeNotifier {
     secondDie = Random().nextInt(6) + 1;
 
     // firstDie = 1;
-    // secondDie = 1;
+    // secondDie = 2;
     int prevPosition = currentPlayer.position;
     if (currentPlayer.isInJail) {
       if (currentPlayer.jailTurns == 3 || firstDie == secondDie) {
@@ -420,6 +421,7 @@ class GameManager extends ChangeNotifier {
     if (players.length == 1) {
       endGame();
       gameEnded = true;
+      notifyListeners();
     }
   }
 
@@ -427,14 +429,13 @@ class GameManager extends ChangeNotifier {
     if (!gameEnded) {
       Player nextPlayer =
           players[(players.indexOf(currentPlayer) + 1) % players.length];
-      if (nextPlayer.status == PlayerStatus.bankrupt) {}
-
       return nextPlayer;
     }
     return Player(name: "Ended", money: 0, index: -1, color: Colors.red);
   }
 
   void endGame() {
+    winner = players[0];
     print("Game ended");
   }
 

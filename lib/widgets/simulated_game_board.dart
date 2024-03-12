@@ -4,7 +4,7 @@ import 'package:ecopoly/game.dart';
 import 'package:ecopoly/game_logic/simulated_game_manager.dart';
 import 'package:ecopoly/util/board.dart';
 import 'package:ecopoly/util/player_position.dart';
-import 'package:ecopoly/widgets/content_widget.dart';
+import 'package:ecopoly/widgets/content.dart';
 import 'package:ecopoly/widgets/player_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';

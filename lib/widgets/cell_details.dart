@@ -124,63 +124,107 @@ class CellDetails extends StatelessWidget {
               (cell.type != CellType.bikelane && cell.type != CellType.utility))
             PropertyInfo(currentPlayerIndex: currentPlayerIndex, cell: cell),
           if (cell is Tax) taxInfo(cell),
-          if (cell.type == CellType.utility) utilityInfo(cell as Property),
-          if (cell.type == CellType.bikelane) bikeInfo(cell as Property)
+          if (cell.type == CellType.utility)
+            UtilityInfo(
+              cell: cell as Property,
+              currentPlayerIndex: currentPlayerIndex,
+            ),
+          if (cell.type == CellType.bikelane)
+            BikeInfo(
+              cell: cell as Property,
+              currentPlayerIndex: currentPlayerIndex,
+            ),
         ],
       ),
     );
   }
 }
 
-Widget bikeInfo(Property cell) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            cell.name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+class BikeInfo extends StatelessWidget {
+  final Property cell;
+  final int currentPlayerIndex;
+  const BikeInfo(
+      {super.key, required this.cell, required this.currentPlayerIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    final GameManager gameManager =
+        Provider.of<GameManager>(context, listen: false);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              cell.name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-          ),
-          Text(
-            cell.type.name.toUpperCase(),
-            style: const TextStyle(fontSize: 14, color: Colors.white),
-          ),
-          Row(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: (cell).owner?.color ?? Colors.grey.shade900,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 2.0, horizontal: 6.0),
-                    child: Text(
-                      cell.owner?.name ?? "Not owned",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
+            Text(
+              cell.type.name.toUpperCase(),
+              style: const TextStyle(fontSize: 14, color: Colors.white),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (cell).owner?.color ?? Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2.0, horizontal: 6.0),
+                      child: Text(
+                        cell.owner?.name ?? "Not owned",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          bikeLaneRent(cell.rent)
-        ],
+                if (cell.owner != null &&
+                    cell.owner!.index == currentPlayerIndex)
+                  GestureDetector(
+                    onTap: () {
+                      gameManager.sellProperty(cell);
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                            offset: const Offset(0, 0),
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child:
+                          const Icon(Icons.sell, color: Colors.white, size: 16),
+                    ),
+                  ),
+              ],
+            ),
+            bikeLaneRent(cell.rent)
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 Widget bikeLaneRent(int rent) {
@@ -213,59 +257,99 @@ Widget bikeInfoRow(int bikeLanes, int rent, double multiplier) {
   );
 }
 
-Widget utilityInfo(Property cell) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            cell.name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          Text(
-            cell.type.name.toUpperCase(),
-            style: const TextStyle(fontSize: 14, color: Colors.white),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              decoration: BoxDecoration(
-                color: (cell).owner?.color ?? Colors.grey.shade900,
-                borderRadius: BorderRadius.circular(100),
+class UtilityInfo extends StatelessWidget {
+  final Property cell;
+  final int currentPlayerIndex;
+  const UtilityInfo(
+      {super.key, required this.cell, required this.currentPlayerIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    final GameManager gameManager =
+        Provider.of<GameManager>(context, listen: false);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              cell.name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-                child: Text(
-                  cell.owner?.name ?? "Not owned",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
+            ),
+            Text(
+              cell.type.name.toUpperCase(),
+              style: const TextStyle(fontSize: 14, color: Colors.white),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: (cell).owner?.color ?? Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2.0, horizontal: 6.0),
+                      child: Text(
+                        cell.owner?.name ?? "Not owned",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  if (cell.owner != null &&
+                      cell.owner!.index == currentPlayerIndex)
+                    GestureDetector(
+                      onTap: () {
+                        gameManager.sellProperty(cell);
+                      },
+                      child: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: const Offset(0, 0),
+                            ),
+                          ],
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: const Icon(Icons.sell,
+                            color: Colors.white, size: 16),
+                      ),
+                    ),
+                ],
               ),
             ),
-          ),
-          const Text(
-            "If one Utility is owned, rent is 4x the dice roll, if both Utilities are owned, rent is 4x the dice roll",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+            const Text(
+              "If one Utility is owned, rent is 4x the dice roll, if both Utilities are owned, rent is 4x the dice roll",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 Widget taxInfo(Tax cell) {

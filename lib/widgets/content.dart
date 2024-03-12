@@ -74,7 +74,7 @@ class _ContentState extends State<Content> {
                             final event = entry.value;
                             return Padding(
                               padding:
-                                  const EdgeInsets.symmetric(vertical: 2.0),
+                                  const EdgeInsets.symmetric(vertical: 8.0),
                               child: Opacity(
                                 opacity: index == 0
                                     ? 1.0
